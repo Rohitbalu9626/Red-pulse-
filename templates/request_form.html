@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Red Pulse — Blood Request</title>
+  <meta name="description" content="Submit an urgent blood request and find the nearest matching donors and blood banks." />
+  <meta name="theme-color" content="#e63946" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/static/icon-512.png" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+<div class="app-wrapper">
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🩸</div>
+      <div class="logo-text">Red <span>Pulse</span></div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-label">Main</div>
+      <a href="/dashboard" class="nav-item"><span class="icon">📊</span><span>Dashboard</span></a>
+      <a href="/register" class="nav-item"><span class="icon">👤</span><span>Register Donor</span></a>
+      <a href="/request" class="nav-item active"><span class="icon">💉</span><span>Blood Request</span></a>
+      <a href="/sos" class="nav-item"><span class="icon">🆘</span><span>SOS System</span></a>
+    </div>
+  </nav>
+  <div class="main-content">
+    <header class="topbar">
+      <div class="topbar-title">Submit Blood Request</div>
+      <div class="topbar-right"><a href="/dashboard" class="btn btn-outline">← Back</a></div>
+    </header>
+    <div class="page-body">
+      <div class="form-card">
+        <div class="form-title">Blood Request Form</div>
+        <div class="form-subtitle">Fill in the patient and hospital details. Our system will instantly match the nearest available donors and banks.</div>
+
+        <form id="request-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="req-patient">Patient Name *</label>
+              <input type="text" id="req-patient" placeholder="Patient's full name" required />
+            </div>
+            <div class="form-group">
+              <label for="req-phone">Contact Phone</label>
+              <input type="tel" id="req-phone" placeholder="e.g. 9876543210" />
+            </div>
+            <div class="form-group">
+              <label for="req-blood">Blood Type Required *</label>
+              <select id="req-blood" required>
+                <option value="">— Select —</option>
+                <option>O-</option><option>O+</option><option>A-</option><option>A+</option>
+                <option>B-</option><option>B+</option><option>AB-</option><option>AB+</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="req-units">Units Needed *</label>
+              <input type="number" id="req-units" placeholder="e.g. 2" min="1" required />
+            </div>
+            <div class="form-group full">
+              <label for="req-hospital">Hospital Name</label>
+              <input type="text" id="req-hospital" placeholder="e.g. Apollo Hospital, New Delhi" />
+            </div>
+            <div class="form-group full" style="margin-top:4px;">
+              <label>Urgency Level *</label>
+              <div class="urgency-selector">
+                <input type="radio" name="urgency" id="u-low" value="low" class="urgency-opt" />
+                <label for="u-low">🟢<br>Low</label>
+                <input type="radio" name="urgency" id="u-medium" value="medium" class="urgency-opt" checked />
+                <label for="u-medium">🔵<br>Medium</label>
+                <input type="radio" name="urgency" id="u-critical" value="critical" class="urgency-opt" />
+                <label for="u-critical">🟡<br>Critical</label>
+                <input type="radio" name="urgency" id="u-sos" value="SOS" class="urgency-opt" />
+                <label for="u-sos">🆘<br>SOS</label>
+              </div>
+            </div>
+            <div class="form-group full">
+              <label>Hospital Location</label>
+              <div style="display:flex;gap:10px;align-items:center;">
+                <input type="text" id="req-lat" placeholder="Latitude" readonly style="flex:1;" />
+                <input type="text" id="req-lng" placeholder="Longitude" readonly style="flex:1;" />
+                <button type="button" class="btn btn-outline" onclick="detectHospitalLocation()">📍 Detect</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;">
+            <button type="submit" class="btn btn-primary" id="req-submit-btn">💉 Submit Request</button>
+            <button type="button" class="btn btn-outline" onclick="findNearest()">🔍 Find Nearest Bank</button>
+            <button type="reset" class="btn btn-outline">Clear</button>
+          </div>
+          <div id="req-msg" style="margin-top:16px;font-size:14px;"></div>
+        </form>
+
+        <!-- Nearest Results -->
+        <div id="nearest-results" style="margin-top:24px;display:none;">
+          <h3 style="font-size:15px;font-weight:700;margin-bottom:12px;">📍 Nearest Blood Banks</h3>
+          <div id="nearest-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="toast-container"></div>
+<script>
+function detectHospitalLocation() {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(pos => {
+    document.getElementById('req-lat').value = pos.coords.latitude.toFixed(6);
+    document.getElementById('req-lng').value = pos.coords.longitude.toFixed(6);
+  });
+}
+
+async function findNearest() {
+  const lat = document.getElementById('req-lat').value;
+  const lng = document.getElementById('req-lng').value;
+  if (!lat || !lng) { alert('Please detect your location first.'); return; }
+
+  try {
+    const banks = await fetch(`/api/banks/nearest?lat=${lat}&lng=${lng}`).then(r => r.json());
+    const container = document.getElementById('nearest-results');
+    const list = document.getElementById('nearest-list');
+    container.style.display = 'block';
+
+    if (!banks.length) {
+      list.innerHTML = '<p style="color:var(--text-muted);">No banks found within 25km.</p>';
+      return;
+    }
+
+    list.innerHTML = banks.map(b => `
+      <div class="request-item">
+        <div class="req-blood-badge" style="background:linear-gradient(135deg,#2dc653,#1a9c40);">🏥</div>
+        <div class="req-info">
+          <div class="req-patient">${b.name}</div>
+          <div class="req-hospital">${b.distance_km} km away</div>
+        </div>
+      </div>`).join('');
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+document.getElementById('request-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const urgency = document.querySelector('input[name="urgency"]:checked')?.value || 'medium';
+  const btn = document.getElementById('req-submit-btn');
+  btn.textContent = 'Submitting…'; btn.disabled = true;
+
+  const payload = {
+    patient_name: document.getElementById('req-patient').value,
+    blood_type: document.getElementById('req-blood').value,
+    units_needed: parseInt(document.getElementById('req-units').value),
+    hospital_name: document.getElementById('req-hospital').value,
+    hospital_latitude: parseFloat(document.getElementById('req-lat').value) || null,
+    hospital_longitude: parseFloat(document.getElementById('req-lng').value) || null,
+    urgency_level: urgency,
+    requester_phone: document.getElementById('req-phone').value
+  };
+
+  // If SOS, route to SOS endpoint
+  const endpoint = urgency === 'SOS'
+    ? '/api/sos/trigger'
+    : '/api/requests/new';
+
+  if (urgency === 'SOS') {
+    payload.units = payload.units_needed;
+    payload.lat = payload.hospital_latitude;
+    payload.lng = payload.hospital_longitude;
+    payload.contact_phone = payload.requester_phone;
+  }
+
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    const msg = document.getElementById('req-msg');
+    if (res.ok) {
+      const donorsAlerted = data.donors_alerted ? ` — ${data.donors_alerted} donors alerted!` : '';
+      msg.style.color = 'var(--emerald)';
+      msg.textContent = `✅ ${data.message}${donorsAlerted}`;
+      e.target.reset();
+    } else {
+      msg.style.color = 'var(--crimson)';
+      msg.textContent = '❌ ' + (data.error || 'Submission failed');
+    }
+  } catch (err) {
+    document.getElementById('req-msg').textContent = '❌ Network error. Please try again.';
+  } finally {
+    btn.textContent = '💉 Submit Request'; btn.disabled = false;
+  }
+});
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js');
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Red Pulse — Register Donor</title>
+  <meta name="description" content="Register as a blood donor and help save lives with Red Pulse." />
+  <meta name="theme-color" content="#e63946" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/static/icon-512.png" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+<div class="app-wrapper">
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🩸</div>
+      <div class="logo-text">Red <span>Pulse</span></div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-label">Main</div>
+      <a href="/dashboard" class="nav-item"><span class="icon">📊</span><span>Dashboard</span></a>
+      <a href="/register" class="nav-item active"><span class="icon">👤</span><span>Register Donor</span></a>
+      <a href="/request" class="nav-item"><span class="icon">💉</span><span>Blood Request</span></a>
+      <a href="/sos" class="nav-item"><span class="icon">🆘</span><span>SOS System</span></a>
+    </div>
+  </nav>
+  <div class="main-content">
+    <header class="topbar">
+      <div class="topbar-title">Register New Donor</div>
+      <div class="topbar-right"><a href="/dashboard" class="btn btn-outline">← Back</a></div>
+    </header>
+    <div class="page-body">
+      <div class="form-card">
+        <div class="form-title">Donor Registration</div>
+        <div class="form-subtitle">Your info stays private and is only used for matching life-saving emergencies.</div>
+
+        <form id="donor-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="donor-name">Full Name *</label>
+              <input type="text" id="donor-name" placeholder="e.g. Priya Sharma" required />
+            </div>
+            <div class="form-group">
+              <label for="donor-phone">Phone Number *</label>
+              <input type="tel" id="donor-phone" placeholder="e.g. 9876543210" required />
+            </div>
+            <div class="form-group">
+              <label for="donor-email">Email Address</label>
+              <input type="email" id="donor-email" placeholder="optional, for SOS emails" />
+            </div>
+            <div class="form-group">
+              <label for="donor-blood">Blood Type *</label>
+              <select id="donor-blood" required>
+                <option value="">— Select —</option>
+                <option>O-</option><option>O+</option><option>A-</option><option>A+</option>
+                <option>B-</option><option>B+</option><option>AB-</option><option>AB+</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="donor-city">City</label>
+              <input type="text" id="donor-city" placeholder="e.g. Delhi" />
+            </div>
+            <div class="form-group">
+              <label for="donor-health">Health Status</label>
+              <select id="donor-health">
+                <option value="fit">Fit — ready to donate</option>
+                <option value="pending">Pending — under review</option>
+                <option value="deferred">Deferred — temporarily ineligible</option>
+              </select>
+            </div>
+            <div class="form-group full">
+              <label>Location</label>
+              <div style="display:flex;gap:10px;align-items:center;">
+                <input type="text" id="donor-lat" placeholder="Latitude" readonly style="flex:1;" />
+                <input type="text" id="donor-lng" placeholder="Longitude" readonly style="flex:1;" />
+                <button type="button" class="btn btn-outline" id="detect-btn" onclick="detectLocation()">📍 Detect</button>
+              </div>
+              <p id="location-status" style="font-size:12px;color:var(--text-muted);margin-top:4px;"></p>
+            </div>
+          </div>
+
+          <div style="margin-top:24px;display:flex;gap:12px;align-items:center;">
+            <button type="submit" class="btn btn-primary" id="submit-btn">✓ Register Donor</button>
+            <button type="reset" class="btn btn-outline">Clear</button>
+          </div>
+          <div id="form-msg" style="margin-top:16px;font-size:14px;"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="toast-container"></div>
+<script>
+function detectLocation() {
+  const btn = document.getElementById('detect-btn');
+  const status = document.getElementById('location-status');
+  btn.textContent = '⏳ Detecting…';
+  btn.disabled = true;
+
+  if (!navigator.geolocation) {
+    status.textContent = 'Geolocation not supported by your browser.';
+    btn.textContent = '📍 Detect'; btn.disabled = false;
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      document.getElementById('donor-lat').value = pos.coords.latitude.toFixed(6);
+      document.getElementById('donor-lng').value = pos.coords.longitude.toFixed(6);
+      status.style.color = 'var(--emerald)';
+      status.textContent = '✅ Location captured!';
+      btn.textContent = '📍 Detect'; btn.disabled = false;
+    },
+    () => {
+      status.style.color = 'var(--crimson)';
+      status.textContent = '❌ Unable to get location. Please enter manually.';
+      document.getElementById('donor-lat').removeAttribute('readonly');
+      document.getElementById('donor-lng').removeAttribute('readonly');
+      btn.textContent = '📍 Detect'; btn.disabled = false;
+    }
+  );
+}
+
+document.getElementById('donor-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('submit-btn');
+  btn.textContent = 'Registering…'; btn.disabled = true;
+
+  const payload = {
+    name: document.getElementById('donor-name').value,
+    phone: document.getElementById('donor-phone').value,
+    email: document.getElementById('donor-email').value,
+    blood_type: document.getElementById('donor-blood').value,
+    city: document.getElementById('donor-city').value,
+    health_status: document.getElementById('donor-health').value,
+    latitude: parseFloat(document.getElementById('donor-lat').value) || null,
+    longitude: parseFloat(document.getElementById('donor-lng').value) || null,
+    is_available: true
+  };
+
+  try {
+    const res = await fetch('/api/donors/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    const msg = document.getElementById('form-msg');
+    if (res.ok) {
+      msg.style.color = 'var(--emerald)';
+      msg.textContent = `✅ Registration successful! Your donor ID is #${data.donor_id}`;
+      e.target.reset();
+    } else {
+      msg.style.color = 'var(--crimson)';
+      msg.textContent = '❌ Error: ' + (data.error || 'Registration failed');
+    }
+  } catch (err) {
+    document.getElementById('form-msg').textContent = '❌ Network error. Please try again.';
+  } finally {
+    btn.textContent = '✓ Register Donor'; btn.disabled = false;
+  }
+});
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js');
+  });
+}
+</script>
+</body>
+</html>

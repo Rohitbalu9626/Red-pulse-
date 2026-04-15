@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Red Pulse — Admin Dashboard</title>
+  <meta name="description" content="Real-time blood bank management dashboard with live inventory, donor tracking, and AI demand forecasting." />
+  <meta name="theme-color" content="#e63946" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/static/icon-512.png" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <style>
+    .sos-incoming-bar {
+      background: linear-gradient(90deg, var(--crimson-dark), var(--crimson));
+      padding: 10px 32px; font-size: 13px; font-weight: 700;
+      display: none; align-items: center; justify-content: space-between;
+      animation: pulse-banner 1s infinite;
+    }
+    .sos-incoming-bar.show { display: flex; }
+    @keyframes pulse-banner { 0%,100%{opacity:1} 50%{opacity:0.7} }
+  </style>
+</head>
+<body>
+<div class="app-wrapper">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🩸</div>
+      <div class="logo-text">Red <span>Pulse</span></div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-label">Main</div>
+      <a href="/dashboard" class="nav-item active">
+        <span class="icon">📊</span><span>Dashboard</span>
+      </a>
+      <a href="/register" class="nav-item">
+        <span class="icon">👤</span><span>Register Donor</span>
+      </a>
+      <a href="/request" class="nav-item">
+        <span class="icon">💉</span><span>Blood Request</span>
+      </a>
+      <a href="/sos" class="nav-item">
+        <span class="icon">🆘</span><span>SOS System</span>
+      </a>
+      <div class="nav-label">Analytics</div>
+      <a href="#forecast-section" class="nav-item">
+        <span class="icon">🔮</span><span>AI Forecast</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <div class="main-content">
+    <!-- SOS Banner -->
+    <div class="sos-incoming-bar" id="sos-banner">
+      🆘 &nbsp;<span id="sos-banner-text">EMERGENCY ALERT RECEIVED</span>
+      <button class="btn btn-outline" onclick="document.getElementById('sos-banner').classList.remove('show')">Dismiss</button>
+    </div>
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-title">Admin Dashboard</div>
+      <div class="topbar-right">
+        <div class="ws-status">
+          <div class="ws-dot" id="ws-dot"></div>
+          <span id="ws-label">Connecting…</span>
+        </div>
+        <a href="/request" class="btn btn-primary">+ New Request</a>
+      </div>
+    </header>
+
+    <div class="page-body">
+
+      <!-- Stat Cards -->
+      <div class="stats-grid">
+        <div class="stat-card red">
+          <div class="stat-icon">🏥</div>
+          <div class="stat-value" id="active-requests-count">–</div>
+          <div class="stat-label">Active Requests</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon">🧑‍🤝‍🧑</div>
+          <div class="stat-value" id="available-donors-count">–</div>
+          <div class="stat-label">Available Donors</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-icon">⚠️</div>
+          <div class="stat-value" id="low-stock-count">–</div>
+          <div class="stat-label">Low Stock Alerts</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-icon">🏦</div>
+          <div class="stat-value" id="banks-count">–</div>
+          <div class="stat-label">Active Blood Banks</div>
+        </div>
+      </div>
+
+      <!-- Inventory Grid -->
+      <div class="section-header">
+        <div class="section-title">Blood Inventory — Live Stock</div>
+        <span class="badge badge-blue" id="last-updated-label">Updating…</span>
+      </div>
+      <div class="blood-grid" id="blood-inventory-grid">
+        <!-- Populated via JS -->
+      </div>
+
+      <!-- Two Column Section -->
+      <div class="dash-grid">
+        <!-- Active Requests -->
+        <div class="panel">
+          <div class="panel-title">Active Requests</div>
+          <div class="request-list" id="active-requests-list">
+            <p style="color:var(--text-muted);font-size:13px;">Loading…</p>
+          </div>
+        </div>
+
+        <!-- Live Map -->
+        <div class="panel">
+          <div class="panel-title">Live Location Map</div>
+          <div id="live-map"></div>
+        </div>
+      </div>
+
+      <!-- AI Forecast Section -->
+      <div id="forecast-section">
+        <div class="section-header" style="margin-bottom:16px;">
+          <div class="section-title">🔮 AI Blood Demand Forecast (7 Days)</div>
+          <select id="forecast-blood-type" class="btn btn-outline" onchange="loadForecast(this.value)">
+            <option>O+</option><option>O-</option><option>A+</option><option>A-</option>
+            <option>B+</option><option>B-</option><option>AB+</option><option>AB-</option>
+          </select>
+        </div>
+        <div class="panel">
+          <div class="chart-wrapper"><canvas id="forecast-chart"></canvas></div>
+          <p id="forecast-recommendation" style="font-size:13px;color:var(--amber);margin-top:14px;text-align:center;"></p>
+        </div>
+      </div>
+
+    </div><!-- / page-body -->
+  </div><!-- / main-content -->
+</div><!-- / app-wrapper -->
+
+<!-- SOS Overlay -->
+<div class="sos-overlay" id="sos-overlay">
+  <div class="sos-card">
+    <div class="sos-icon">🆘</div>
+    <div class="sos-title">SOS ALERT</div>
+    <div class="sos-hospital" id="sos-hospital-name">Hospital Name</div>
+    <div class="sos-detail" id="sos-detail">Blood type • Units needed</div>
+    <div class="sos-timer" id="sos-timer">02:00:00</div>
+    <div class="sos-timer-label">TIME REMAINING</div>
+    <div class="sos-counter">
+      <strong id="sos-response-count">0</strong>
+      Donors Responded
+    </div>
+    <div class="sos-actions">
+      <button class="btn btn-success" onclick="closeSOS()">✓ Coordinate Response</button>
+      <button class="btn btn-outline" onclick="closeSOS()">Dismiss</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
+<script src="/static/js/map.js"></script>
+<script src="/static/js/dashboard.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').then(reg => {
+        console.log('SW registered!', reg);
+      }).catch(err => console.log('SW registration failed:', err));
+    });
+  }
+</script>
+</body>
+</html>
