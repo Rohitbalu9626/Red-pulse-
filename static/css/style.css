@@ -368,12 +368,83 @@ textarea { resize: vertical; min-height: 80px; }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
-  .sidebar { width: 60px; }
-  .logo-text, .nav-label, .nav-item span { display: none; }
-  .nav-item { justify-content: center; padding: 12px; }
-  .main-content { margin-left: 60px; }
+  /* Tablet layout: Collapsed sidebar */
+  .sidebar { width: 70px; padding: 20px 0; }
+  .logo-text, .nav-label, .nav-item span:not(.icon) { display: none; }
+  .logo-icon { width: 32px; height: 32px; font-size: 16px; margin: 0 auto; }
+  .sidebar-logo { padding: 0 0 20px; justify-content: center; }
+  .nav-item { justify-content: center; padding: 12px; margin: 0 8px; border-radius: var(--radius-sm); }
+  .main-content { margin-left: 70px; }
+  .dash-grid { grid-template-columns: 1fr; }
 }
+
 @media (max-width: 600px) {
+  /* Mobile layout: Bottom Navbar */
+  .app-wrapper { flex-direction: column; }
+  
+  .sidebar {
+    top: auto; bottom: 0;
+    width: 100%; height: 65px;
+    flex-direction: row; padding: 0;
+    border-right: none;
+    border-top: 1px solid var(--border);
+    z-index: 1000;
+  }
+  .sidebar-logo { display: none; }
+  .sidebar-nav {
+    flex-direction: row; width: 100%; justify-content: space-around;
+    padding: 0; margin: 0; gap: 0; align-items: center;
+  }
+  .nav-item {
+    flex-direction: column; padding: 8px 0; margin: 0;
+    gap: 4px; flex: 1; display: flex; align-items: center;
+    border-radius: 0; height: 100%;
+  }
+  .nav-item .icon { font-size: 20px; }
+  .nav-item span:not(.icon) {
+    display: block; font-size: 10px; font-weight: 600;
+    /* ensure text is visible on mobile */
+  }
+  .nav-item:hover, .nav-item.active { background: transparent; color: var(--crimson); }
+  .nav-item.active { border-left: none; border-top: 3px solid var(--crimson); }
+  
+  /* Main content adjustments for mobile */
+  .main-content { margin-left: 0; margin-bottom: 65px; }
+  .topbar { padding: 12px 16px; }
+  .topbar-title { font-size: 16px; }
+  .topbar-right .btn { padding: 6px 12px; font-size: 12px; }
+  
   .page-body { padding: 16px; }
-  .stats-grid { grid-template-columns: 1fr 1fr; }
+  
+  /* Resize grids */
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  .stat-card { padding: 16px; }
+  .stat-icon { font-size: 24px; margin-bottom: 8px; }
+  .stat-value { font-size: 24px; }
+  
+  .blood-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .blood-cell { padding: 12px 8px; }
+  .blood-type-label { font-size: 16px; }
+  .blood-units strong { font-size: 18px; }
+  
+  /* Adjust forms and panels */
+  .panel { padding: 16px; }
+  .form-card { padding: 20px; border-radius: var(--radius-md); }
+  .form-grid { grid-template-columns: 1fr; gap: 12px; }
+  .form-group.full { grid-column: 1 / -1; }
+  .urgency-selector { grid-template-columns: 1fr 1fr; }
+  
+  /* SOS Screen Adjustments */
+  .sos-trigger-hero { padding: 24px 16px; }
+  .sos-big-icon { font-size: 56px; }
+  .sos-hero-title { font-size: 26px; }
+  .sos-card { padding: 24px 16px; }
+  .sos-icon { font-size: 48px; }
+  .sos-title { font-size: 24px; }
+  .sos-timer { font-size: 32px; }
+  .live-counter { flex-direction: column; gap: 16px; }
+  
+  /* Toast adjustment */
+  #toast-container { bottom: 85px; right: 16px; left: 16px; }
+  .toast { min-width: auto; width: 100%; }
 }
