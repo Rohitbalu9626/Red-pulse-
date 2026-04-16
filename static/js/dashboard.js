@@ -2,7 +2,6 @@
 
 const API = '';   // same origin
 let forecastChart = null;
-let sosTimerInterval = null;
 
 // ===== WEBSOCKET SETUP =====
 const socket = io();
@@ -30,13 +29,7 @@ socket.on('new_request', (data) => {
   loadStats();
 });
 
-socket.on('sos_alert', (data) => {
-  // Show SOS alert overlay on dashboard
-  openSOSOverlay(data);
-  document.getElementById('sos-banner').classList.add('show');
-  document.getElementById('sos-banner-text').textContent =
-    `🆘 SOS: ${data.units} units of ${data.blood_type} needed at ${data.hospital_name}`;
-});
+// sos_alert is now handled globally in global_sos.js
 
 // ===== LOAD STATS =====
 async function loadStats() {
@@ -157,32 +150,7 @@ async function loadForecast(bloodType = 'O+') {
   }
 }
 
-// ===== SOS OVERLAY =====
-function openSOSOverlay(data) {
-  document.getElementById('sos-hospital-name').textContent = data.hospital_name || 'Emergency Hospital';
-  document.getElementById('sos-detail').textContent = `${data.blood_type} blood • ${data.units} units needed`;
-  document.getElementById('sos-overlay').classList.add('visible');
-  startSOSTimer(7200); // 2-hour countdown
-}
-
-function closeSOS() {
-  document.getElementById('sos-overlay').classList.remove('visible');
-  if (sosTimerInterval) clearInterval(sosTimerInterval);
-}
-
-function startSOSTimer(seconds) {
-  if (sosTimerInterval) clearInterval(sosTimerInterval);
-  const el = document.getElementById('sos-timer');
-  let remaining = seconds;
-  sosTimerInterval = setInterval(() => {
-    remaining--;
-    if (remaining <= 0) { clearInterval(sosTimerInterval); el.textContent = '00:00:00'; return; }
-    const h = String(Math.floor(remaining / 3600)).padStart(2, '0');
-    const m = String(Math.floor((remaining % 3600) / 60)).padStart(2, '0');
-    const s = String(remaining % 60).padStart(2, '0');
-    el.textContent = `${h}:${m}:${s}`;
-  }, 1000);
-}
+// Local SOS overlay removed (handled globally)
 
 // ===== TOAST UTILITY =====
 function showToast(msg, type = 'info') {

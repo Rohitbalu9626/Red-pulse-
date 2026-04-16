@@ -145,31 +145,14 @@
   </div><!-- / main-content -->
 </div><!-- / app-wrapper -->
 
-<!-- SOS Overlay -->
-<div class="sos-overlay" id="sos-overlay">
-  <div class="sos-card">
-    <div class="sos-icon">🆘</div>
-    <div class="sos-title">SOS ALERT</div>
-    <div class="sos-hospital" id="sos-hospital-name">Hospital Name</div>
-    <div class="sos-detail" id="sos-detail">Blood type • Units needed</div>
-    <div class="sos-timer" id="sos-timer">02:00:00</div>
-    <div class="sos-timer-label">TIME REMAINING</div>
-    <div class="sos-counter">
-      <strong id="sos-response-count">0</strong>
-      Donors Responded
-    </div>
-    <div class="sos-actions">
-      <button class="btn btn-success" onclick="closeSOS()">✓ Coordinate Response</button>
-      <button class="btn btn-outline" onclick="closeSOS()">Dismiss</button>
-    </div>
-  </div>
-</div>
+<!-- Global SOS Overlay mapped from global_sos.js -->
 
 <!-- Toast Container -->
 <div id="toast-container"></div>
 
 <script src="/static/js/map.js"></script>
 <script src="/static/js/dashboard.js"></script>
+<script src="/static/js/global_sos.js"></script>
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {

@@ -74,9 +74,14 @@
           <div class="sos-big-icon">🆘</div>
           <div class="sos-hero-title">SOS Emergency Alert</div>
           <div class="sos-hero-sub">Instantly broadcasts to all compatible, nearby donors via app + email within seconds.</div>
-          <button class="btn btn-primary" style="font-size:16px;padding:14px 36px;" onclick="toggleForm()">
-            🚨 Trigger Emergency SOS
-          </button>
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+            <button class="btn btn-primary" style="font-size:16px;padding:14px 36px;" onclick="toggleForm()">
+              🚨 Trigger Emergency SOS
+            </button>
+            <button class="btn btn-outline" style="font-size:16px;padding:14px 24px;color:var(--amber);border-color:var(--amber);" onclick="autoFillSOS()">
+              ⚡ Auto-Fill Demo
+            </button>
+          </div>
         </div>
 
         <!-- SOS Form (hidden by default) -->
@@ -182,6 +187,18 @@ function toggleForm() {
   f.style.display = f.style.display === 'none' ? 'block' : 'none';
 }
 
+function autoFillSOS() {
+  document.getElementById('sos-form-container').style.display = 'block';
+  document.getElementById('sos-bt').value = 'O-';
+  document.getElementById('sos-units').value = '3';
+  document.getElementById('sos-hospital').value = 'AIIMS, New Delhi';
+  document.getElementById('sos-contact').value = 'Dr. Sharma';
+  document.getElementById('sos-phone').value = '9876543210';
+  document.getElementById('sos-lat').value = '28.5672';
+  document.getElementById('sos-lng').value = '77.2100';
+  showToast('Demo data loaded. Ready to submit 🆘', 'info');
+}
+
 function detectSOS() {
   if (!navigator.geolocation) return;
   navigator.geolocation.getCurrentPosition(pos => {
@@ -271,5 +288,6 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+<script src="/static/js/global_sos.js"></script>
 </body>
 </html>
