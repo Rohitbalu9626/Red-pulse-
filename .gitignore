@@ -5,5 +5,4 @@ __pycache__/
 instance/
 database/*.db
 node_modules/
-frontend/dist/
 frontend/node_modules/

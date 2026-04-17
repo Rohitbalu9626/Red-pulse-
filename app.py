@@ -8,7 +8,8 @@ from database.db import db
 from sockets.events import socketio
 
 def create_app():
-    app = Flask(__name__)
+    # Serve React App from frontend/dist
+    app = Flask(__name__, static_folder='frontend/dist', static_url_path='/')
     app.config.from_object(Config)
 
     # Initialize extensions
@@ -40,15 +41,14 @@ def create_app():
     def health():
         return jsonify({"status": "healthy"})
 
-    @app.route('/sw.js')
-    def serve_sw():
-        from flask import send_from_directory
-        return send_from_directory('static', 'sw.js', mimetype='application/javascript')
+    @app.errorhandler(404)
+    def not_found(e):
+        # Allow React Router to handle 404s and client-side routing
+        return app.send_static_file('index.html')
 
-    @app.route('/manifest.json')
-    def serve_manifest():
-        from flask import send_from_directory
-        return send_from_directory('static', 'manifest.json', mimetype='application/json')
+    @app.route('/')
+    def index():
+        return app.send_static_file('index.html')
 
     return app
 
