@@ -24,17 +24,18 @@ body {
   font-family: var(--font-sans);
   background-color: var(--bg-main);
   color: var(--text-main);
-  overflow-x: hidden;
+  overflow: hidden; /* Lock master scrolling so only main-wrapper scrolls */
   display: flex;
   flex-direction: column;
   height: 100vh;
 }
 
-/* TOP NAVBAR (PULSE THEMED) */
+/* BOTTOM NAVBAR (PULSE THEMED) */
 .luxury-navbar {
+  order: 2; /* Forces it to the bottom under main-wrapper */
   width: 100%;
   background: linear-gradient(90deg, var(--brand-pulse), var(--brand-pulse-dark));
-  border-bottom: 2px solid rgba(0,0,0,0.1);
+  border-top: 2px solid rgba(0,0,0,0.2);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -42,7 +43,7 @@ body {
   height: 72px;
   position: relative;
   z-index: 100;
-  box-shadow: 0 4px 15px rgba(217, 4, 41, 0.2);
+  box-shadow: 0 -4px 15px rgba(217, 4, 41, 0.2);
   box-sizing: border-box;
 }
 
@@ -89,7 +90,7 @@ body {
 .mobile-toggle { display: none; background: none; border: none; font-size: 24px; cursor: pointer; color: #FFF; }
 
 /* Main Content */
-.main-wrapper { flex: 1; overflow-y: auto; position: relative; }
+.main-wrapper { order: 1; flex: 1; overflow-y: auto; position: relative; }
 
 /* Dashboard Container */
 .dashboard-container { padding: 40px; animation: fade-in 0.8s ease forwards; max-width: 1400px; margin: 0 auto; }
@@ -166,11 +167,11 @@ label { display: block; font-weight: 700; font-size: 12px; color: var(--text-mut
 .form-group.full { grid-column: span 2; }
 
 /* AI Chatbot Float */
-.ai-chat-btn { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--brand-pulse), var(--brand-pulse-dark)); color: white; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 4px 20px rgba(217, 4, 41, 0.4); cursor: pointer; z-index: 1000; transition: transform 0.3s; }
+.ai-chat-btn { position: fixed; top: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--brand-pulse), var(--brand-pulse-dark)); color: white; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 4px 20px rgba(217, 4, 41, 0.4); cursor: pointer; z-index: 1000; transition: transform 0.3s; }
 .ai-chat-btn:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(217, 4, 41, 0.6); }
-.ai-chat-window { position: fixed; bottom: 90px; right: 20px; width: 350px; height: 500px; background: white; border-radius: 16px; border: 1px solid var(--border-subtle); box-shadow: 0 10px 40px rgba(0,0,0,0.15); display: none; flex-direction: column; z-index: 1000; overflow: hidden; }
-.ai-chat-window.open { display: flex; animation: slide-up 0.3s ease forwards; }
-@keyframes slide-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.ai-chat-window { position: fixed; top: 90px; right: 20px; width: 350px; height: 500px; background: white; border-radius: 16px; border: 1px solid var(--border-subtle); box-shadow: 0 10px 40px rgba(0,0,0,0.15); display: none; flex-direction: column; z-index: 1000; overflow: hidden; }
+.ai-chat-window.open { display: flex; animation: slide-down-chat 0.3s ease forwards; }
+@keyframes slide-down-chat { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 .ai-chat-header { background: linear-gradient(90deg, var(--brand-pulse), var(--brand-pulse-dark)); color: white; padding: 16px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; }
 .ai-chat-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: #F8FAFC; }
 .chat-msg { max-width: 80%; padding: 10px 14px; border-radius: 12px; font-size: 14px; line-height: 1.4; }
@@ -206,7 +207,7 @@ label { display: block; font-weight: 700; font-size: 12px; color: var(--text-mut
   .form-card { padding: 20px; }
   .btn { width: 100%; margin-bottom: 8px; justify-content: center; }
   
-  .ai-chat-window { width: calc(100% - 40px); bottom: 90px; right: 20px; height: 60vh; }
+  .ai-chat-window { width: calc(100% - 40px); top: 90px; right: 20px; height: 60vh; z-index: 9999; }
   
   .profile-hero { flex-direction: column; text-align: center; align-items: center; padding: 24px; }
   .availability-toggle { margin-left: 0; margin-top: 16px; text-align: center; }

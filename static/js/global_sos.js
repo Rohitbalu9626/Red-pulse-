@@ -85,7 +85,7 @@
   const chatHTML = `
     <div id="ai-chatbot-widget">
       <div class="ai-chat-btn" onclick="toggleChatWindow()">
-        <span>✦</span>
+        <span>✚</span>
       </div>
       <div class="ai-chat-window" id="ai-chat-window">
         <div class="ai-chat-header">
