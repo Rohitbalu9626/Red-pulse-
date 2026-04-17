@@ -15,6 +15,31 @@ const tabs = [
   { to: '/forecast', icon: '🔮', label: 'Forecast' },
 ];
 
+const Sidebar = () => {
+  const location = useLocation();
+  const path = location.pathname;
+
+  return (
+    <aside className="desktop-sidebar">
+      <div className="sidebar-brand">
+        <img src="/logo.png" alt="Red Pulse" className="brand-logo" />
+        <div className="brand-text">RED <span>PULSE</span></div>
+      </div>
+      <nav className="sidebar-nav">
+        {tabs.map(tab => (
+          <Link key={tab.to} to={tab.to} className={`sidebar-link ${path === tab.to ? 'active' : ''}`}>
+            <span className="sidebar-icon">{tab.icon}</span>
+            <span className="sidebar-label">{tab.label}</span>
+          </Link>
+        ))}
+      </nav>
+      <div className="sidebar-footer">
+        <div className="status-dot"></div> System Online
+      </div>
+    </aside>
+  );
+};
+
 const BottomNav = () => {
   const location = useLocation();
   const path = location.pathname;
@@ -50,9 +75,11 @@ const Header = () => {
 
   return (
     <header className="luxury-navbar" id="top-navbar">
-      <div className="brand">
-        <div className="brand-pulse"></div>
-        Red <span>Pulse</span>
+      <div className="mobile-brand-wrapper">
+        <img src="/logo.png" alt="Logo" className="mobile-logo" />
+        <div className="brand">
+          Red <span>Pulse</span>
+        </div>
       </div>
       <div className="navbar-right">
         <div className="real-time-clock">
@@ -69,17 +96,22 @@ const Header = () => {
 function App() {
   return (
     <Router>
-      <Header />
-      <main className="main-wrapper" id="main-content">
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/register" element={<RegisterDonor />} />
-          <Route path="/request" element={<BloodRequest />} />
-          <Route path="/sos" element={<SOSSystem />} />
-          <Route path="/forecast" element={<Forecast />} />
-        </Routes>
-      </main>
-      <BottomNav />
+      <div className="app-layout">
+        <Sidebar />
+        <div className="main-content-area">
+          <Header />
+          <main className="main-wrapper" id="main-content">
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/register" element={<RegisterDonor />} />
+              <Route path="/request" element={<BloodRequest />} />
+              <Route path="/sos" element={<SOSSystem />} />
+              <Route path="/forecast" element={<Forecast />} />
+            </Routes>
+          </main>
+          <BottomNav />
+        </div>
+      </div>
     </Router>
   );
 }
