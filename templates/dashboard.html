@@ -3,14 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Red Pulse — Luxury Dashboard</title>
-  <meta name="description" content="Premium real-time blood bank management dashboard." />
+  <title>Red Pulse — Live Dashboard</title>
+  <meta name="description" content="Red Pulse Medical Network Dashboard." />
   <link rel="manifest" href="/manifest.json" />
   
-  <!-- Fonts: Playfair Display & DM Mono & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="/static/css/dashboard-luxury.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -18,35 +17,31 @@
 </head>
 <body>
 
-  <!-- Sidebar -->
-  <aside class="luxury-sidebar">
+  <!-- Top Navbar -->
+  <header class="luxury-navbar">
     <div class="brand">
       <div class="brand-pulse"></div>
       Red <span>Pulse</span>
     </div>
     
-    <nav class="nav-menu">
+    <nav class="nav-menu" id="mobile-nav">
       <a href="/dashboard" class="nav-link active">Dashboard</a>
       <a href="/register" class="nav-link">Donor Base</a>
       <a href="/request" class="nav-link">Transfusions</a>
       <a href="/sos" class="nav-link">Emergency SOS</a>
     </nav>
     
-    <div class="sidebar-bottom">
+    <div class="navbar-right">
       <div class="real-time-clock" id="live-clock">
         00:00 <span class="clock-pulse"></span>
       </div>
-      <div style="color:var(--text-muted); font-size: 11px;">LOCAL TIME</div>
-      
-      <div class="emergency-alert">
-        <div>
-          <div class="emer-text">Critical Requests</div>
-          <div class="emer-count" id="critical-alert-count">0</div>
-        </div>
-        <div class="brand-pulse" style="width:12px; height:12px; animation-duration:1s;"></div>
+      <div class="emergency-indicator">
+        🔴 <span id="critical-alert-count">0</span> CRITICAL
       </div>
     </div>
-  </aside>
+
+    <button class="mobile-toggle" onclick="document.getElementById('mobile-nav').classList.toggle('open')">☰</button>
+  </header>
 
   <!-- Main Area -->
   <main class="main-wrapper">
@@ -73,15 +68,15 @@
           <div class="stat-value" id="total-units-count">–</div>
         </div>
         <div class="stat-card crimson">
-          <div class="stat-label">Critical Types</div>
+          <div class="stat-label">Critical Protocols</div>
           <div class="stat-value" style="color: var(--crimson);" id="critical-types-count">–</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Active Donors</div>
+          <div class="stat-label">Ready Donors</div>
           <div class="stat-value" id="available-donors-count">–</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Daily Requests</div>
+          <div class="stat-label">Active Transfusions</div>
           <div class="stat-value" id="active-requests-count">–</div>
         </div>
       </div>
@@ -113,7 +108,7 @@
         <div class="panel">
           <div class="section-head" style="font-size: 18px; padding-bottom: 12px; margin-bottom:16px; border:none; justify-content:space-between; align-items:center;">
              <span>Demand Forecast</span>
-             <select id="forecast-blood-type" onchange="loadForecast(this.value)" style="background:var(--bg-panel); color:#FFF; border:1px solid var(--border-subtle); padding:4px 8px; border-radius:4px; font-family:var(--font-mono); outline:none;">
+             <select id="forecast-blood-type" onchange="loadForecast(this.value)" style="width: auto; background:var(--bg-panel); color:var(--text-main); border:1px solid var(--border-subtle); padding:4px 8px; border-radius:4px; font-family:var(--font-mono); outline:none;">
                <option>O+</option><option>O-</option><option>A+</option><option>A-</option>
                <option>B+</option><option>B-</option><option>AB+</option><option>AB-</option>
              </select>
@@ -124,11 +119,10 @@
         </div>
       </div>
       
-      <br/><br/>
     </div>
   </main>
   
-  <div id="toast-container" style="position:fixed; bottom:20px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:8px;"></div>
+  <div id="toast-container" style="position:fixed; bottom:20px; left:20px; z-index:9999; display:flex; flex-direction:column; gap:8px;"></div>
 
   <!-- Scripts -->
   <script src="/static/js/dashboard.js"></script>

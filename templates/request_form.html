@@ -32,37 +32,34 @@
 </head>
 <body>
 
-  <!-- Sidebar -->
-  <aside class="luxury-sidebar">
+  <!-- Top Navbar -->
+  <header class="luxury-navbar">
     <div class="brand">
       <div class="brand-pulse"></div>
       Red <span>Pulse</span>
     </div>
     
-    <nav class="nav-menu">
+    <nav class="nav-menu" id="mobile-nav">
       <a href="/dashboard" class="nav-link">Dashboard</a>
       <a href="/register" class="nav-link">Donor Base</a>
       <a href="/request" class="nav-link active">Transfusions</a>
       <a href="/sos" class="nav-link">Emergency SOS</a>
     </nav>
     
-    <div class="sidebar-bottom">
-      <div class="emergency-alert">
-        <div>
-          <div class="emer-text">Response Status</div>
-          <div class="emer-count" style="font-size:16px;">READY</div>
-        </div>
-        <div class="brand-pulse" style="width:12px; height:12px; animation-duration:1s;"></div>
+    <div class="navbar-right">
+      <div class="real-time-clock" id="live-clock">
+        00:00 <span class="clock-pulse"></span>
+      </div>
+      <div class="emergency-indicator">
+        🔴 <span id="critical-alert-count">0</span> CRITICAL
       </div>
     </div>
-  </aside>
+
+    <button class="mobile-toggle" onclick="document.getElementById('mobile-nav').classList.toggle('open')">☰</button>
+  </header>
 
   <!-- Main Area -->
   <main class="main-wrapper">
-    <!-- Top Banner -->
-    <div class="ecg-banner" style="justify-content: flex-start; padding-left: 40px;">
-      <div class="ecg-title">Transfusion Request System</div>
-    </div>
 
     <!-- Content Container -->
     <div class="dashboard-container">

@@ -72,26 +72,34 @@
 </head>
 <body>
 
-  <!-- Sidebar -->
-  <aside class="luxury-sidebar">
+  <!-- Top Navbar -->
+  <header class="luxury-navbar">
     <div class="brand">
       <div class="brand-pulse"></div>
       Red <span>Pulse</span>
     </div>
     
-    <nav class="nav-menu">
+    <nav class="nav-menu" id="mobile-nav">
       <a href="/dashboard" class="nav-link">Dashboard</a>
-      <a href="/register" class="nav-link active">Donor Base</a>
+      <a href="/register" class="nav-link">Donor Base</a>
       <a href="/request" class="nav-link">Transfusions</a>
       <a href="/sos" class="nav-link">Emergency SOS</a>
     </nav>
-  </aside>
+    
+    <div class="navbar-right">
+      <div class="real-time-clock" id="live-clock">
+        00:00 <span class="clock-pulse"></span>
+      </div>
+      <div class="emergency-indicator">
+        🔴 <span id="critical-alert-count">0</span> CRITICAL
+      </div>
+    </div>
+
+    <button class="mobile-toggle" onclick="document.getElementById('mobile-nav').classList.toggle('open')">☰</button>
+  </header>
 
   <!-- Main Area -->
   <main class="main-wrapper">
-    <div class="ecg-banner" style="justify-content: flex-start; padding-left: 40px;">
-      <div class="ecg-title">Donor Intelligence File</div>
-    </div>
 
     <!-- Content Container -->
     <div class="dashboard-container" id="profile-body">

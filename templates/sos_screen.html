@@ -31,37 +31,34 @@
 </head>
 <body>
 
-  <!-- Sidebar -->
-  <aside class="luxury-sidebar">
+  <!-- Top Navbar -->
+  <header class="luxury-navbar">
     <div class="brand">
       <div class="brand-pulse"></div>
       Red <span>Pulse</span>
     </div>
     
-    <nav class="nav-menu">
+    <nav class="nav-menu" id="mobile-nav">
       <a href="/dashboard" class="nav-link">Dashboard</a>
       <a href="/register" class="nav-link">Donor Base</a>
       <a href="/request" class="nav-link">Transfusions</a>
-      <a href="/sos" class="nav-link active" style="color:var(--crimson); border-left-color:var(--critical-color);">Emergency SOS</a>
+      <a href="/sos" class="nav-link active" style="color:var(--crimson); border-bottom-color:var(--critical-color);">Emergency SOS</a>
     </nav>
     
-    <div class="sidebar-bottom">
-      <div class="emergency-alert">
-        <div>
-          <div class="emer-text">System Status</div>
-          <div class="emer-count" style="font-size:16px;" id="ws-label">LIVE</div>
-        </div>
-        <div class="brand-pulse" id="ws-dot" style="width:12px; height:12px; background:var(--critical-color); box-shadow:0 0 10px var(--critical-color);"></div>
+    <div class="navbar-right">
+      <div class="real-time-clock" id="live-clock">
+        00:00 <span class="clock-pulse"></span>
+      </div>
+      <div class="emergency-indicator" style="background:var(--critical-color); color:white; border:none;">
+        LIVE <span class="brand-pulse" id="ws-dot" style="margin-left:8px; width:10px; height:10px; background:var(--bg-panel); display:inline-block; animation:none;"></span>
       </div>
     </div>
-  </aside>
+
+    <button class="mobile-toggle" onclick="document.getElementById('mobile-nav').classList.toggle('open')">☰</button>
+  </header>
 
   <!-- Main Area -->
   <main class="main-wrapper">
-    <!-- Top Banner -->
-    <div class="ecg-banner" style="justify-content: flex-start; padding-left: 40px; border-bottom-color:var(--critical-color);">
-      <div class="ecg-title" style="color:var(--critical-color);">Emergency Broadcast Console</div>
-    </div>
 
     <!-- Content Container -->
     <div class="dashboard-container">
