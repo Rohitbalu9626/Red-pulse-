@@ -34,33 +34,7 @@ def create_app():
         # Import models so SQLAlchemy creates them
         from database import models
         db.create_all()
-        print("Database initialized successfully.")
 
-    @app.route('/')
-    @app.route('/dashboard')
-    def dashboard():
-        from flask import render_template
-        return render_template('dashboard.html')
-
-    @app.route('/register')
-    def register_page():
-        from flask import render_template
-        return render_template('donor_register.html')
-
-    @app.route('/request')
-    def request_page():
-        from flask import render_template
-        return render_template('request_form.html')
-
-    @app.route('/sos')
-    def sos_page():
-        from flask import render_template
-        return render_template('sos_screen.html')
-
-    @app.route('/donor/<int:donor_id>')
-    def donor_profile(donor_id):
-        from flask import render_template
-        return render_template('donor_profile.html')
 
     @app.route('/health')
     def health():
