@@ -6,6 +6,9 @@
   <title>Red Pulse — Emergency SOS</title>
   <meta name="description" content="Trigger an SOS emergency blood alert." />
   <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" href="/static/icons/app-icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="/static/icons/app-icon.png">
+
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,12 +41,7 @@
       Red <span>Pulse</span>
     </div>
     
-    <nav class="nav-menu" id="mobile-nav">
-      <a href="/dashboard" class="nav-link">Dashboard</a>
-      <a href="/register" class="nav-link">Donor Base</a>
-      <a href="/request" class="nav-link">Transfusions</a>
-      <a href="/sos" class="nav-link active" style="color:var(--crimson); border-bottom-color:var(--critical-color);">Emergency SOS</a>
-    </nav>
+    
     
     <div class="navbar-right">
       <div class="real-time-clock" id="live-clock">
@@ -54,7 +52,7 @@
       </div>
     </div>
 
-    <button class="mobile-toggle" onclick="document.getElementById('mobile-nav').classList.toggle('open')">☰</button>
+    
   </header>
 
   <!-- Main Area -->
@@ -155,6 +153,31 @@
   </main>
   
   <div id="toast-container" style="position:fixed; bottom:20px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:8px;"></div>
+
+
+  <!-- Bottom Tab Navigation -->
+  <nav class="bottom-tab-nav">
+    <a href="/dashboard" class="tab-link ">
+      <div class="tab-icon">📊</div>
+      <div class="tab-label">Dashboard</div>
+    </a>
+    <a href="/register" class="tab-link ">
+      <div class="tab-icon">👤</div>
+      <div class="tab-label">Register Donor</div>
+    </a>
+    <a href="/request" class="tab-link ">
+      <div class="tab-icon">💉</div>
+      <div class="tab-label">Blood Request</div>
+    </a>
+    <a href="/sos" class="tab-link active">
+      <div class="tab-icon">🆘</div>
+      <div class="tab-label">SOS System</div>
+    </a>
+    <a href="/dashboard" class="tab-link">
+      <div class="tab-icon">🔮</div>
+      <div class="tab-label">AI Forecast</div>
+    </a>
+  </nav>
 
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script src="/static/js/global_sos.js"></script>

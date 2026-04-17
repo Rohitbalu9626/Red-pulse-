@@ -6,12 +6,40 @@
   <title>Red Pulse — Live Dashboard</title>
   <meta name="description" content="Red Pulse Medical Network Dashboard." />
   <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" href="/static/icons/app-icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="/static/icons/app-icon.png">
+
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="/static/css/dashboard-luxury.css" />
+
+  <!-- Bottom Tab Navigation -->
+  <nav class="bottom-tab-nav">
+    <a href="/dashboard" class="tab-link active">
+      <div class="tab-icon">📊</div>
+      <div class="tab-label">Dashboard</div>
+    </a>
+    <a href="/register" class="tab-link ">
+      <div class="tab-icon">👤</div>
+      <div class="tab-label">Register Donor</div>
+    </a>
+    <a href="/request" class="tab-link ">
+      <div class="tab-icon">💉</div>
+      <div class="tab-label">Blood Request</div>
+    </a>
+    <a href="/sos" class="tab-link ">
+      <div class="tab-icon">🆘</div>
+      <div class="tab-label">SOS System</div>
+    </a>
+    <a href="/dashboard" class="tab-link">
+      <div class="tab-icon">🔮</div>
+      <div class="tab-label">AI Forecast</div>
+    </a>
+  </nav>
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
@@ -24,12 +52,7 @@
       Red <span>Pulse</span>
     </div>
     
-    <nav class="nav-menu" id="mobile-nav">
-      <a href="/dashboard" class="nav-link active">Dashboard</a>
-      <a href="/register" class="nav-link">Donor Base</a>
-      <a href="/request" class="nav-link">Transfusions</a>
-      <a href="/sos" class="nav-link">Emergency SOS</a>
-    </nav>
+    
     
     <div class="navbar-right">
       <div class="real-time-clock" id="live-clock">
@@ -40,7 +63,7 @@
       </div>
     </div>
 
-    <button class="mobile-toggle" onclick="document.getElementById('mobile-nav').classList.toggle('open')">☰</button>
+    
   </header>
 
   <!-- Main Area -->
