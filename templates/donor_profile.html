@@ -1,235 +1,226 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Red Pulse — Donor Profile</title>
-  <meta name="description" content="View donor profile, donation history, and eligibility status on Red Pulse." />
-  <meta name="theme-color" content="#e63946" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Red Pulse — Donor Intelligence</title>
+  <meta name="description" content="View donor profiles." />
   <link rel="manifest" href="/manifest.json" />
-  <link rel="apple-touch-icon" href="/static/icon-512.png" />
-  <link rel="stylesheet" href="/static/css/style.css" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/static/css/dashboard-luxury.css" />
   <style>
     .profile-hero {
-      background: linear-gradient(135deg, rgba(72,149,239,0.12), rgba(26,30,42,0));
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 28px 32px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 32px;
       display: flex; gap: 24px; align-items: center;
       margin-bottom: 24px;
     }
     .avatar {
-      width: 72px; height: 72px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--crimson), var(--crimson-dark));
+      width: 80px; height: 80px; border-radius: 50%;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--crimson);
       display: flex; align-items: center; justify-content: center;
-      font-size: 32px; font-weight: 900; flex-shrink: 0;
-      box-shadow: 0 0 24px var(--crimson-glow);
+      font-family: var(--font-serif); font-size: 32px; color: var(--crimson);
+      box-shadow: 0 0 20px rgba(210,0,26,0.2); flex-shrink: 0;
     }
-    .profile-meta h2 { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
-    .profile-meta p  { font-size: 13px; color: var(--text-secondary); }
+    .profile-meta h2 { font-family: var(--font-serif); font-size: 28px; color: #FFF; margin-bottom: 4px; margin-top:0; }
+    .profile-meta p  { font-family: var(--font-mono); font-size: 13px; color: var(--text-muted); margin: 4px 0; }
+    
     .badge-blood {
-      padding: 6px 16px; border-radius: 100px; font-weight: 800; font-size: 14px;
-      background: rgba(230,57,70,0.15); border: 1px solid var(--crimson); color: var(--crimson);
-      margin-top: 8px; display: inline-block;
+      padding: 6px 16px; border-radius: 4px; font-family: var(--font-mono); font-size: 14px; font-weight: bold;
+      background: rgba(210,0,26,0.1); border: 1px solid var(--crimson); color: var(--crimson);
+      margin-top: 12px; display: inline-block;
     }
-    .availability-toggle {
-      margin-left: auto; text-align: right;
-    }
+    .availability-toggle { margin-left: auto; text-align: right; }
+    
+    /* Toggle switch luxury override */
     .toggle-switch { position: relative; display: inline-block; width: 52px; height: 28px; }
     .toggle-switch input { opacity: 0; width: 0; height: 0; }
     .toggle-slider {
-      position: absolute; inset: 0; background: var(--bg-raised);
-      border-radius: 28px; cursor: pointer; border: 1px solid var(--border);
-      transition: var(--transition);
+      position: absolute; inset: 0; background: rgba(255,255,255,0.05);
+      border-radius: 28px; cursor: pointer; border: 1px solid var(--border-subtle);
+      transition: 0.3s;
     }
     .toggle-slider::before {
-      content: ''; position: absolute; height: 20px; width: 20px;
-      left: 4px; bottom: 3px; background: var(--text-muted);
-      border-radius: 50%; transition: var(--transition);
+      content: ''; position: absolute; height: 18px; width: 18px;
+      left: 4px; bottom: 4px; background: var(--text-muted);
+      border-radius: 50%; transition: 0.3s;
     }
-    .toggle-switch input:checked + .toggle-slider { background: rgba(45,198,83,0.2); border-color: var(--emerald); }
-    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(24px); background: var(--emerald); }
-    .hist-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    .hist-table th { text-align: left; padding: 10px 14px; color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
-    .hist-table td { padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.03); }
-    .hist-table tr:hover td { background: var(--bg-raised); }
-    .badge-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .toggle-switch input:checked + .toggle-slider { background: rgba(0,230,118,0.1); border-color: var(--ok-color); }
+    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(24px); background: var(--ok-color); box-shadow: 0 0 10px var(--ok-color); }
+    
+    .badge-row { display: flex; gap: 16px; flex-wrap: wrap; }
     .badge-item {
-      background: var(--bg-raised); border: 1px solid var(--border);
-      border-radius: var(--radius-md); padding: 16px; min-width: 120px; text-align: center;
+      background: var(--bg-panel); border: 1px solid var(--border-subtle);
+      border-radius: 8px; padding: 20px; min-width: 140px; text-align: center;
+      transition: transform 0.3s;
     }
-    .badge-item .badge-icon { font-size: 36px; margin-bottom: 8px; }
-    .badge-item .badge-name { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
-    .badge-item.earned { border-color: var(--amber); background: rgba(244,162,97,0.06); }
-    .eligibility-bar { height: 8px; border-radius: 100px; background: var(--bg-raised); margin: 6px 0; overflow: hidden; }
-    .eligibility-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg, var(--emerald), #1a9c40); transition: width 0.8s ease; }
+    .badge-item:hover { transform: translateY(-4px); }
+    .badge-item .badge-icon { font-size: 32px; margin-bottom: 12px; filter: grayscale(1); opacity: 0.5; }
+    .badge-item .badge-name { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); }
+    .badge-item.earned { border-color: var(--pending-color); background: rgba(255,171,0,0.05); }
+    .badge-item.earned .badge-icon { filter: grayscale(0); opacity: 1; }
+    .badge-item.earned .badge-name { color: var(--pending-color); }
+    
+    .panel-block { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
   </style>
 </head>
 <body>
-<div class="app-wrapper">
-  <nav class="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-icon">🩸</div>
-      <div class="logo-text">Red <span>Pulse</span></div>
+
+  <!-- Sidebar -->
+  <aside class="luxury-sidebar">
+    <div class="brand">
+      <div class="brand-pulse"></div>
+      Red <span>Pulse</span>
     </div>
-    <div class="sidebar-nav">
-      <div class="nav-label">Main</div>
-      <a href="/dashboard" class="nav-item"><span class="icon">📊</span><span>Dashboard</span></a>
-      <a href="/register" class="nav-item"><span class="icon">👤</span><span>Register Donor</span></a>
-      <a href="/request" class="nav-item"><span class="icon">💉</span><span>Blood Request</span></a>
-      <a href="/sos" class="nav-item"><span class="icon">🆘</span><span>SOS System</span></a>
+    
+    <nav class="nav-menu">
+      <a href="/dashboard" class="nav-link">Dashboard</a>
+      <a href="/register" class="nav-link active">Donor Base</a>
+      <a href="/request" class="nav-link">Transfusions</a>
+      <a href="/sos" class="nav-link">Emergency SOS</a>
+    </nav>
+  </aside>
+
+  <!-- Main Area -->
+  <main class="main-wrapper">
+    <div class="ecg-banner" style="justify-content: flex-start; padding-left: 40px;">
+      <div class="ecg-title">Donor Intelligence File</div>
     </div>
-  </nav>
-  <div class="main-content">
-    <header class="topbar">
-      <div class="topbar-title">Donor Profile</div>
-      <div class="topbar-right"><a href="/dashboard" class="btn btn-outline">← Back</a></div>
-    </header>
-    <div class="page-body" id="profile-body">
+
+    <!-- Content Container -->
+    <div class="dashboard-container" id="profile-body">
       <!-- Populated by JS -->
-      <p style="color:var(--text-muted);">Loading profile…</p>
+      <div style="font-family:var(--font-mono); color:var(--text-muted);">DECRYPTING PROFILE...</div>
     </div>
-  </div>
-</div>
-<div id="toast-container"></div>
-<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-<script src="/static/js/global_sos.js"></script>
-<script>
-const donorId = new URLSearchParams(window.location.search).get('id') || 1;
+  </main>
+  
+  <div id="toast-container" style="position:fixed; bottom:20px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:8px;"></div>
 
-async function loadProfile() {
-  try {
-    const donor = await fetch(`/api/donors/${donorId}`).then(r => {
-      if (!r.ok) throw new Error('Donor not found');
-      return r.json();
-    });
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="/static/js/global_sos.js"></script>
+  <script>
+    const donorId = new URLSearchParams(window.location.search).get('id') || 1;
 
-    // Eligibility: at least 56 days since last donation
-    const lastDonated = donor.last_donated ? new Date(donor.last_donated) : null;
-    const daysSince = lastDonated
-      ? Math.floor((Date.now() - lastDonated) / (1000*60*60*24))
-      : 999;
-    const eligibilityPct = Math.min(100, Math.round((daysSince / 56) * 100));
-    const isEligible = daysSince >= 56;
+    async function loadProfile() {
+      try {
+        const checkRes = await fetch(`/api/donors/${donorId}`);
+        if(!checkRes.ok) throw new Error('Donor file not found in system bounds');
+        const donor = await checkRes.json();
 
-    const initials = donor.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+        // Eligibility Math
+        const lastDonated = donor.last_donated ? new Date(donor.last_donated) : null;
+        const daysSince = lastDonated ? Math.floor((Date.now() - lastDonated) / (1000*60*60*24)) : 999;
+        const eligibilityPct = Math.min(100, Math.round((daysSince / 56) * 100));
+        const isEligible = daysSince >= 56;
+        const initials = donor.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+        
+        let statColor = isEligible ? 'style="color:var(--ok-color);"' : 'style="color:var(--critical-color);"';
 
-    document.getElementById('profile-body').innerHTML = `
-      <!-- Hero -->
-      <div class="profile-hero">
-        <div class="avatar">${initials}</div>
-        <div class="profile-meta">
-          <h2>${donor.name}</h2>
-          <p>📍 ${donor.city || 'Location not set'} &nbsp;|&nbsp; 📱 ${donor.phone}</p>
-          <p>${donor.email || ''}</p>
-          <span class="badge-blood">${donor.blood_type}</span>
-        </div>
-        <div class="availability-toggle">
-          <p style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">Available to Donate</p>
-          <label class="toggle-switch">
-            <input type="checkbox" id="avail-toggle" ${donor.is_available ? 'checked' : ''} onchange="toggleAvailability(this.checked)" />
-            <span class="toggle-slider"></span>
-          </label>
-          <p id="avail-label" style="font-size:11px;color:var(--text-muted);margin-top:6px;">
-            ${donor.is_available ? 'Active' : 'Inactive'}
-          </p>
-        </div>
-      </div>
+        document.getElementById('profile-body').innerHTML = `
+          <div class="profile-hero">
+            <div class="avatar">${initials}</div>
+            <div class="profile-meta">
+              <h2>${donor.name}</h2>
+              <p>COORDS: ${donor.city || 'UNDEFINED'} &nbsp;//&nbsp; COMM: ${donor.phone}</p>
+              <p>${donor.email || 'NO SECURE COMM LINK'}</p>
+              <div class="badge-blood">${donor.blood_type}</div>
+            </div>
+            <div class="availability-toggle">
+              <p style="font-family:var(--font-mono); font-size:12px; color:var(--text-muted); margin-bottom:12px;">SYSTEM READINESS</p>
+              <label class="toggle-switch">
+                <input type="checkbox" id="avail-toggle" ${donor.is_available ? 'checked' : ''} onchange="toggleAvailability(this.checked)" />
+                <span class="toggle-slider"></span>
+              </label>
+              <p id="avail-label" style="font-family:var(--font-mono); font-size:11px; color:#FFF; margin-top:8px;">
+                ${donor.is_available ? 'STANDBY' : 'OFF-GRID'}
+              </p>
+            </div>
+          </div>
 
-      <!-- Stats Row -->
-      <div class="stats-grid" style="margin-bottom:24px;">
-        <div class="stat-card green">
-          <div class="stat-icon">📅</div>
-          <div class="stat-value">${daysSince < 999 ? daysSince : '—'}</div>
-          <div class="stat-label">Days Since Last Donation</div>
-        </div>
-        <div class="stat-card ${isEligible ? 'green' : 'red'}">
-          <div class="stat-icon">${isEligible ? '✅' : '⏳'}</div>
-          <div class="stat-value">${isEligible ? 'Eligible' : 'Wait'}</div>
-          <div class="stat-label">Donation Eligibility</div>
-        </div>
-        <div class="stat-card blue">
-          <div class="stat-icon">🩺</div>
-          <div class="stat-value">${donor.health_status}</div>
-          <div class="stat-label">Health Status</div>
-        </div>
-        <div class="stat-card amber">
-          <div class="stat-icon">🏆</div>
-          <div class="stat-value">0</div>
-          <div class="stat-label">Total Donations</div>
-        </div>
-      </div>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">RECOVERY DAYS</div>
+              <div class="stat-value">${daysSince < 999 ? daysSince : '—'}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">STATUS</div>
+              <div class="stat-value" ${statColor}>${isEligible ? 'CLEARED' : 'LOCKED'}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">HEALTH</div>
+              <div class="stat-value">${donor.health_status.toUpperCase()}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">LIFESAVED</div>
+              <div class="stat-value">0</div>
+            </div>
+          </div>
 
-      <!-- Eligibility Bar -->
-      <div class="panel" style="margin-bottom:20px;">
-        <div class="panel-title">Donation Eligibility Progress</div>
-        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary);margin-bottom:4px;">
-          <span>Recovery Progress</span>
-          <span>${eligibilityPct}% (${daysSince < 999 ? daysSince : 0} / 56 days)</span>
-        </div>
-        <div class="eligibility-bar">
-          <div class="eligibility-fill" style="width:${eligibilityPct}%"></div>
-        </div>
-        <p style="font-size:12px;color:var(--text-muted);margin-top:6px;">
-          ${isEligible
-            ? '🟢 You are eligible to donate blood right now!'
-            : `⏳ Eligible to donate again in ${56 - daysSince} days.`}
-        </p>
-      </div>
+          <div class="panel-block">
+            <div class="section-head" style="margin-bottom:12px; border:none; padding:0;">
+              <div>Clearance Progress</div>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:12px; color:var(--text-muted); margin-bottom:8px;">
+              <span>TISSUE REGENERATION</span>
+              <span>${eligibilityPct}% (${daysSince < 999 ? daysSince : 0} / 56 CYCLE)</span>
+            </div>
+            <div style="height:6px; background:rgba(255,255,255,0.05); border-radius:3px; overflow:hidden;">
+              <div style="height:100%; width:${eligibilityPct}%; background:${isEligible ? 'var(--ok-color)' : 'var(--critical-color)'}; transition:width 1s;"></div>
+            </div>
+          </div>
 
-      <!-- Badges -->
-      <div class="panel" style="margin-bottom:20px;">
-        <div class="panel-title">Donor Badges</div>
-        <div class="badge-row">
-          <div class="badge-item earned"><div class="badge-icon">🩸</div><div class="badge-name">First Drop</div></div>
-          <div class="badge-item"><div class="badge-icon">🔥</div><div class="badge-name">3x Donor</div></div>
-          <div class="badge-item"><div class="badge-icon">🦸</div><div class="badge-name">Lifesaver</div></div>
-          <div class="badge-item"><div class="badge-icon">🆘</div><div class="badge-name">SOS Hero</div></div>
-          <div class="badge-item"><div class="badge-icon">⭐</div><div class="badge-name">10x Legend</div></div>
-        </div>
-        <p style="font-size:12px;color:var(--text-muted);margin-top:12px;">Earn badges by donating more blood and responding to SOS alerts.</p>
-      </div>
+          <div class="panel-block">
+            <div class="section-head" style="border:none; padding:0; margin-bottom:20px;">
+              <div>Medals of Honor</div>
+            </div>
+            <div class="badge-row">
+              <div class="badge-item earned"><div class="badge-icon">🩸</div><div class="badge-name">FIRST DROP</div></div>
+              <div class="badge-item"><div class="badge-icon">🔥</div><div class="badge-name">3X DONOR</div></div>
+              <div class="badge-item"><div class="badge-icon">🦸</div><div class="badge-name">LIFESAVER</div></div>
+              <div class="badge-item"><div class="badge-icon">🆘</div><div class="badge-name">SOS RESPONDER</div></div>
+            </div>
+          </div>
+        `;
+      } catch(e) {
+        document.getElementById('profile-body').innerHTML = `
+          <div class="panel-block" style="border-color:var(--critical-color);">
+            <p style="font-family:var(--font-mono); color:var(--critical-color);">CRITICAL: ${e.message}</p>
+          </div>
+        `;
+      }
+    }
 
-      <!-- Donation History -->
-      <div class="panel">
-        <div class="panel-title">Donation History</div>
-        <div id="donation-history">
-          <p style="color:var(--text-muted);font-size:13px;">No donation records found.</p>
-        </div>
-      </div>
-    `;
-  } catch(e) {
-    document.getElementById('profile-body').innerHTML =
-      `<div class="panel"><p style="color:var(--crimson);">❌ ${e.message}. <a href="/dashboard" style="color:var(--sapphire);">Go back</a></p></div>`;
-  }
-}
+    async function toggleAvailability(state) {
+      await fetch(`/api/donors/${donorId}/availability`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_available: state })
+      });
+      document.getElementById('avail-label').textContent = state ? 'STANDBY' : 'OFF-GRID';
+      showToast(state ? 'DONOR UPLINK CONNECTED' : 'DONOR UPLINK SEVERED', state ? 'success' : 'warning');
+    }
 
-async function toggleAvailability(state) {
-  await fetch(`/api/donors/${donorId}/availability`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ is_available: state })
-  });
-  document.getElementById('avail-label').textContent = state ? 'Active' : 'Inactive';
-  showToast(state ? 'Marked as available' : 'Marked as unavailable', state ? 'success' : 'warning');
-}
+    function showToast(msg, type='info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      let color = type === 'error' || type === 'warning' ? '#FF2A2A' : '#00E676';
+      toast.style.cssText = `
+        background: #18181A; border-left: 4px solid ${color}; color: #F0F0F0;
+        padding: 12px 20px; font-family: 'DM Mono', monospace; font-size: 13px;
+        margin-bottom:8px; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      `;
+      toast.innerHTML = msg;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 4000);
+    }
 
-function showToast(msg, type='info') {
-  const container = document.getElementById('toast-container');
-  const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
-  const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
-  toast.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
-  container.appendChild(toast);
-  setTimeout(() => toast.remove(), 4500);
-}
-
-loadProfile();
-
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js');
-    });
-  }
-</script>
+    loadProfile();
+  </script>
 </body>
 </html>

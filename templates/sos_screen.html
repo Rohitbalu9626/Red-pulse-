@@ -1,293 +1,288 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Red Pulse — SOS Emergency System</title>
-  <meta name="description" content="Trigger an SOS emergency blood alert and instantly notify compatible nearby donors." />
-  <meta name="theme-color" content="#e63946" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Red Pulse — Emergency SOS</title>
+  <meta name="description" content="Trigger an SOS emergency blood alert." />
   <link rel="manifest" href="/manifest.json" />
-  <link rel="apple-touch-icon" href="/static/icon-512.png" />
-  <link rel="stylesheet" href="/static/css/style.css" />
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/static/css/dashboard-luxury.css" />
   <style>
-    .sos-page { max-width: 700px; margin: 0 auto; }
     .sos-trigger-hero {
-      background: linear-gradient(135deg, rgba(230,57,70,0.15), rgba(179,35,47,0.08));
-      border: 2px solid var(--crimson);
-      border-radius: var(--radius-lg);
-      padding: 36px; text-align: center; margin-bottom: 28px;
+      background: radial-gradient(circle at center, rgba(210,0,26,0.15) 0%, var(--bg-panel) 100%);
+      border: 1px solid var(--crimson);
+      border-radius: 12px; padding: 40px; text-align: center; margin-bottom: 30px;
     }
-    .sos-big-icon { font-size: 72px; animation: sos-pulse 1s infinite alternate; margin-bottom: 12px; }
-    @keyframes sos-pulse { from{filter:drop-shadow(0 0 8px red)} to{filter:drop-shadow(0 0 28px red);transform:scale(1.05)} }
-    .sos-hero-title { font-size: 36px; font-weight: 900; color: var(--crimson); letter-spacing: -1px; }
-    .sos-hero-sub { font-size: 15px; color: var(--text-secondary); margin: 8px 0 24px; }
-    .sos-live-panel {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: var(--radius-md); padding: 20px; margin-bottom: 20px;
-    }
-    .live-counter { display: flex; justify-content: space-around; text-align: center; margin: 16px 0; }
-    .live-counter-item strong { font-size: 40px; font-weight: 900; display: block; }
-    .live-counter-item span { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
-    .pulse-ring {
-      display: inline-block; width: 12px; height: 12px; border-radius: 50%;
-      background: var(--crimson); box-shadow: 0 0 0 0 var(--crimson-glow);
-      animation: ping 1.2s infinite;
-    }
-    @keyframes ping {
-      0%  { box-shadow: 0 0 0 0 var(--crimson-glow); }
-      70% { box-shadow: 0 0 0 12px transparent; }
-      100%{ box-shadow: 0 0 0 0 transparent; }
-    }
+    .sos-big-icon { font-size: 70px; margin-bottom: 12px; filter: drop-shadow(0 0 20px var(--crimson)); animation: pulse-sos 1s infinite alternate; }
+    @keyframes pulse-sos { from { transform:scale(1); } to { transform:scale(1.1); filter:drop-shadow(0 0 30px var(--crimson)); } }
+    .sos-hero-title { font-family: var(--font-serif); font-size: 36px; color: #FFF; margin-bottom: 8px; }
+    .sos-hero-sub { font-family: var(--font-mono); color: var(--text-muted); font-size: 14px; margin-bottom: 30px; }
+    
+    .live-panel { background: var(--bg-card); border: 1px solid var(--critical-color); border-radius: 12px; padding: 24px; margin-top: 24px; box-shadow: 0 0 20px rgba(255,42,42,0.1); }
+    .live-counter { display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; margin-top: 20px; }
+    .counter-val { font-family: var(--font-serif); font-size: 40px; color: #FFF; }
+    .counter-label { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); text-transform: uppercase; }
   </style>
 </head>
 <body>
-<div class="app-wrapper">
-  <nav class="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-icon">🩸</div>
-      <div class="logo-text">Red <span>Pulse</span></div>
+
+  <!-- Sidebar -->
+  <aside class="luxury-sidebar">
+    <div class="brand">
+      <div class="brand-pulse"></div>
+      Red <span>Pulse</span>
     </div>
-    <div class="sidebar-nav">
-      <div class="nav-label">Main</div>
-      <a href="/dashboard" class="nav-item"><span class="icon">📊</span><span>Dashboard</span></a>
-      <a href="/register" class="nav-item"><span class="icon">👤</span><span>Register Donor</span></a>
-      <a href="/request" class="nav-item"><span class="icon">💉</span><span>Blood Request</span></a>
-      <a href="/sos" class="nav-item active"><span class="icon">🆘</span><span>SOS System</span></a>
-    </div>
-  </nav>
-  <div class="main-content">
-    <header class="topbar">
-      <div class="topbar-title">SOS Emergency System</div>
-      <div class="topbar-right">
-        <div class="ws-status">
-          <div class="ws-dot" id="ws-dot"></div>
-          <span id="ws-label">Connecting…</span>
+    
+    <nav class="nav-menu">
+      <a href="/dashboard" class="nav-link">Dashboard</a>
+      <a href="/register" class="nav-link">Donor Base</a>
+      <a href="/request" class="nav-link">Transfusions</a>
+      <a href="/sos" class="nav-link active" style="color:var(--crimson); border-left-color:var(--critical-color);">Emergency SOS</a>
+    </nav>
+    
+    <div class="sidebar-bottom">
+      <div class="emergency-alert">
+        <div>
+          <div class="emer-text">System Status</div>
+          <div class="emer-count" style="font-size:16px;" id="ws-label">LIVE</div>
         </div>
-        <a href="/dashboard" class="btn btn-outline">← Dashboard</a>
-      </div>
-    </header>
-    <div class="page-body">
-      <div class="sos-page">
-
-        <!-- Hero Panel -->
-        <div class="sos-trigger-hero">
-          <div class="sos-big-icon">🆘</div>
-          <div class="sos-hero-title">SOS Emergency Alert</div>
-          <div class="sos-hero-sub">Instantly broadcasts to all compatible, nearby donors via app + email within seconds.</div>
-          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-            <button class="btn btn-primary" style="font-size:16px;padding:14px 36px;" onclick="toggleForm()">
-              🚨 Trigger Emergency SOS
-            </button>
-            <button class="btn btn-outline" style="font-size:16px;padding:14px 24px;color:var(--amber);border-color:var(--amber);" onclick="autoFillSOS()">
-              ⚡ Auto-Fill Demo
-            </button>
-          </div>
-        </div>
-
-        <!-- SOS Form (hidden by default) -->
-        <div id="sos-form-container" style="display:none;">
-          <div class="panel" style="margin-bottom:20px;">
-            <div class="panel-title">Emergency Details</div>
-            <form id="sos-form">
-              <div class="form-grid">
-                <div class="form-group">
-                  <label for="sos-bt">Blood Type Needed *</label>
-                  <select id="sos-bt" required>
-                    <option value="">— Select —</option>
-                    <option>O-</option><option>O+</option><option>A-</option><option>A+</option>
-                    <option>B-</option><option>B+</option><option>AB-</option><option>AB+</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="sos-units">Units Needed *</label>
-                  <input type="number" id="sos-units" placeholder="e.g. 3" min="1" required />
-                </div>
-                <div class="form-group full">
-                  <label for="sos-hospital">Hospital Name *</label>
-                  <input type="text" id="sos-hospital" placeholder="e.g. AIIMS, New Delhi" required />
-                </div>
-                <div class="form-group">
-                  <label for="sos-contact">Contact Person</label>
-                  <input type="text" id="sos-contact" placeholder="Dr. Mehra / Nurse Anya" />
-                </div>
-                <div class="form-group">
-                  <label for="sos-phone">Contact Phone</label>
-                  <input type="tel" id="sos-phone" placeholder="emergency number" />
-                </div>
-                <div class="form-group full">
-                  <label>Hospital Location</label>
-                  <div style="display:flex;gap:10px;">
-                    <input type="text" id="sos-lat" placeholder="Latitude" style="flex:1;" />
-                    <input type="text" id="sos-lng" placeholder="Longitude" style="flex:1;" />
-                    <button type="button" class="btn btn-outline" onclick="detectSOS()">📍</button>
-                  </div>
-                </div>
-              </div>
-              <div style="margin-top:20px;display:flex;gap:12px;">
-                <button type="submit" class="btn btn-primary" id="sos-submit-btn" style="background:var(--crimson);">
-                  🆘 SEND SOS NOW
-                </button>
-                <button type="button" class="btn btn-outline" onclick="toggleForm()">Cancel</button>
-              </div>
-              <div id="sos-msg" style="margin-top:14px;font-size:14px;"></div>
-            </form>
-          </div>
-        </div>
-
-        <!-- Live Response Panel -->
-        <div class="sos-live-panel" id="live-panel" style="display:none;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
-            <span class="pulse-ring"></span>
-            <strong style="font-size:14px;">LIVE — SOS Broadcast Active</strong>
-          </div>
-          <p id="live-hospital-info" style="color:var(--text-secondary);font-size:13px;margin-bottom:8px;"></p>
-          <div class="live-counter">
-            <div class="live-counter-item">
-              <strong id="timer-display" style="color:var(--amber);font-family:'JetBrains Mono',monospace;">02:00:00</strong>
-              <span>Time Remaining</span>
-            </div>
-            <div class="live-counter-item">
-              <strong id="donors-alerted" style="color:var(--sapphire);">0</strong>
-              <span>Donors Alerted</span>
-            </div>
-            <div class="live-counter-item">
-              <strong id="response-count" style="color:var(--emerald);">0</strong>
-              <span>Responded</span>
-            </div>
-          </div>
-          <button class="btn btn-outline btn-full" onclick="resolveSOS()">✓ Mark as Resolved</button>
-        </div>
-
+        <div class="brand-pulse" id="ws-dot" style="width:12px; height:12px; background:var(--critical-color); box-shadow:0 0 10px var(--critical-color);"></div>
       </div>
     </div>
-  </div>
-</div>
-<div id="toast-container"></div>
+  </aside>
 
-<script>
-let timerInterval = null;
+  <!-- Main Area -->
+  <main class="main-wrapper">
+    <!-- Top Banner -->
+    <div class="ecg-banner" style="justify-content: flex-start; padding-left: 40px; border-bottom-color:var(--critical-color);">
+      <div class="ecg-title" style="color:var(--critical-color);">Emergency Broadcast Console</div>
+    </div>
 
-const socket = io();
-socket.on('connect', () => {
-  document.getElementById('ws-dot').classList.add('connected');
-  document.getElementById('ws-label').textContent = 'Live';
-});
-socket.on('disconnect', () => {
-  document.getElementById('ws-dot').classList.remove('connected');
-  document.getElementById('ws-label').textContent = 'Disconnected';
-});
-socket.on('donor_response', data => {
-  const el = document.getElementById('response-count');
-  el.textContent = parseInt(el.textContent) + 1;
-  showToast(`Donor responded to SOS!`, 'success');
-});
+    <!-- Content Container -->
+    <div class="dashboard-container">
+      
+      <div class="sos-trigger-hero">
+        <div class="sos-big-icon">🆘</div>
+        <div class="sos-hero-title">CRITICAL S.O.S. PROTOCOL</div>
+        <div class="sos-hero-sub">WARNING: THIS ACTION WILL IMMEDIATELY WAKE AND ALERT ALL LOCAL MATCHED DONORS</div>
+        
+        <div style="display:flex; justify-content:center; gap:16px;">
+          <button class="btn btn-primary" style="background:var(--critical-color); font-size:16px; padding:16px 32px; box-shadow:0 0 20px rgba(255,42,42,0.4);" onclick="toggleForm()">INITIATE EMERGENCY OVERRIDE</button>
+          <button class="btn btn-outline" style="border-color:var(--pending-color); color:var(--pending-color);" onclick="autoFillSOS()">AUTO-FILL DEMO</button>
+        </div>
+      </div>
 
-function toggleForm() {
-  const f = document.getElementById('sos-form-container');
-  f.style.display = f.style.display === 'none' ? 'block' : 'none';
-}
+      <div id="sos-form-container" style="display:none;">
+        <div class="form-card" style="border-color:var(--critical-color); max-width:100%;">
+          <div class="form-title" style="color:var(--critical-color);">Emergency Details</div>
+          
+          <form id="sos-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="sos-bt">Blood Type Needed *</label>
+                <select id="sos-bt" required>
+                  <option value="">— Select —</option>
+                  <option>O-</option><option>O+</option><option>A-</option><option>A+</option>
+                  <option>B-</option><option>B+</option><option>AB-</option><option>AB+</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="sos-units">Units *</label>
+                <input type="number" id="sos-units" placeholder="e.g. 3" min="1" required />
+              </div>
+              <div class="form-group full">
+                <label for="sos-hospital">Hospital/Clinic *</label>
+                <input type="text" id="sos-hospital" placeholder="e.g. AIIMS Trauma Center" required />
+              </div>
+              <div class="form-group">
+                <label for="sos-contact">Medical Contact</label>
+                <input type="text" id="sos-contact" placeholder="Doctor / Coordinator" />
+              </div>
+              <div class="form-group">
+                <label for="sos-phone">Emergency Phone</label>
+                <input type="tel" id="sos-phone" placeholder="Contact number" />
+              </div>
+              <div class="form-group full">
+                <label>Coordinates</label>
+                <div style="display:flex;gap:16px;">
+                  <input type="text" id="sos-lat" placeholder="Latitude" style="flex:1;" />
+                  <input type="text" id="sos-lng" placeholder="Longitude" style="flex:1;" />
+                  <button type="button" class="btn btn-outline" onclick="detectSOS()">📍 Detect</button>
+                </div>
+              </div>
+            </div>
+            
+            <div style="margin-top:24px; display:flex; gap:16px;">
+              <button type="submit" class="btn btn-primary" id="sos-submit-btn" style="background:var(--critical-color);">BROADCAST TO NETWORK</button>
+              <button type="button" class="btn btn-outline" onclick="toggleForm()">CANCEL</button>
+            </div>
+            <div id="sos-msg" style="margin-top:16px; font-family:var(--font-mono); font-size:14px;"></div>
+          </form>
+        </div>
+      </div>
 
-function autoFillSOS() {
-  document.getElementById('sos-form-container').style.display = 'block';
-  document.getElementById('sos-bt').value = 'O-';
-  document.getElementById('sos-units').value = '3';
-  document.getElementById('sos-hospital').value = 'AIIMS, New Delhi';
-  document.getElementById('sos-contact').value = 'Dr. Sharma';
-  document.getElementById('sos-phone').value = '9876543210';
-  document.getElementById('sos-lat').value = '28.5672';
-  document.getElementById('sos-lng').value = '77.2100';
-  showToast('Demo data loaded. Ready to submit 🆘', 'info');
-}
+      <!-- Live Monitoring -->
+      <div class="live-panel" id="live-panel" style="display:none;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+          <div class="pulse-ring" style="width:16px; height:16px; background:var(--critical-color); border-radius:50%; animation: pulse-sos 1s infinite alternate;"></div>
+          <div style="font-family:var(--font-mono); color:var(--critical-color); font-size:16px;">LIVE BROADCAST ACTIVE</div>
+        </div>
+        <div id="live-hospital-info" style="font-family:var(--font-serif); font-size:24px; color:#FFF; margin-bottom:24px;"></div>
+        
+        <div class="live-counter">
+          <div>
+            <div class="counter-val" id="timer-display" style="color:var(--pending-color); font-family:var(--font-mono);">02:00:00</div>
+            <div class="counter-label">Time Remaining</div>
+          </div>
+          <div>
+            <div class="counter-val" id="donors-alerted" style="color:var(--ok-color);">0</div>
+            <div class="counter-label">Donors Pinged</div>
+          </div>
+          <div>
+            <div class="counter-val" id="response-count" style="color:#FFF;">0</div>
+            <div class="counter-label">Responses Secured</div>
+          </div>
+        </div>
+        
+        <div style="margin-top:32px; text-align:center;">
+          <button class="btn btn-outline" onclick="resolveSOS()" style="border-color:var(--ok-color); color:var(--ok-color); width:100%;">MARK EMERGENCY RESOLVED</button>
+        </div>
+      </div>
+      
+    </div>
+  </main>
+  
+  <div id="toast-container" style="position:fixed; bottom:20px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:8px;"></div>
 
-function detectSOS() {
-  if (!navigator.geolocation) return;
-  navigator.geolocation.getCurrentPosition(pos => {
-    document.getElementById('sos-lat').value = pos.coords.latitude.toFixed(6);
-    document.getElementById('sos-lng').value = pos.coords.longitude.toFixed(6);
-  });
-}
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="/static/js/global_sos.js"></script>
+  <script>
+    let timerInterval = null;
 
-document.getElementById('sos-form').addEventListener('submit', async e => {
-  e.preventDefault();
-  const btn = document.getElementById('sos-submit-btn');
-  btn.textContent = '🆘 Sending…'; btn.disabled = true;
-
-  const payload = {
-    blood_type: document.getElementById('sos-bt').value,
-    units: parseInt(document.getElementById('sos-units').value),
-    hospital_name: document.getElementById('sos-hospital').value,
-    contact_person: document.getElementById('sos-contact').value,
-    contact_phone: document.getElementById('sos-phone').value,
-    lat: parseFloat(document.getElementById('sos-lat').value) || null,
-    lng: parseFloat(document.getElementById('sos-lng').value) || null,
-    patient_name: 'Emergency Patient'
-  };
-
-  try {
-    const res = await fetch('/api/sos/trigger', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+    const socket = io();
+    socket.on('connect', () => {
+      document.getElementById('ws-label').textContent = 'LIVE';
+      document.getElementById('ws-dot').style.background = 'var(--ok-color)';
+      document.getElementById('ws-dot').style.boxShadow = '0 0 10px var(--ok-color)';
     });
-    const data = await res.json();
-    const msg = document.getElementById('sos-msg');
+    socket.on('disconnect', () => {
+      document.getElementById('ws-label').textContent = 'OFFLINE';
+      document.getElementById('ws-dot').style.background = 'var(--text-muted)';
+      document.getElementById('ws-dot').style.boxShadow = 'none';
+    });
+    socket.on('donor_response', data => {
+      const el = document.getElementById('response-count');
+      el.textContent = parseInt(el.textContent) + 1;
+      showToast('New Donor response received!', 'success');
+    });
 
-    if (res.ok) {
-      msg.style.color = 'var(--emerald)';
-      msg.textContent = `✅ SOS Triggered! ${data.donors_alerted} donors alerted.`;
-      // Show live panel
-      document.getElementById('live-panel').style.display = 'block';
-      document.getElementById('live-hospital-info').textContent =
-        `${payload.hospital_name} — ${payload.blood_type} × ${payload.units} units`;
-      document.getElementById('donors-alerted').textContent = data.donors_alerted;
-      startTimer(7200);
-    } else {
-      msg.style.color = 'var(--crimson)';
-      msg.textContent = '❌ ' + (data.error || 'SOS trigger failed');
+    function toggleForm() {
+      const f = document.getElementById('sos-form-container');
+      f.style.display = f.style.display === 'none' ? 'block' : 'none';
     }
-  } catch (err) {
-    document.getElementById('sos-msg').textContent = '❌ Network error.';
-  } finally {
-    btn.textContent = '🆘 SEND SOS NOW'; btn.disabled = false;
-  }
-});
 
-function startTimer(seconds) {
-  if (timerInterval) clearInterval(timerInterval);
-  let remaining = seconds;
-  const el = document.getElementById('timer-display');
-  timerInterval = setInterval(() => {
-    remaining--;
-    if (remaining <= 0) { clearInterval(timerInterval); el.textContent = 'EXPIRED'; return; }
-    const h = String(Math.floor(remaining / 3600)).padStart(2,'0');
-    const m = String(Math.floor((remaining % 3600) / 60)).padStart(2,'0');
-    const s = String(remaining % 60).padStart(2,'0');
-    el.textContent = `${h}:${m}:${s}`;
-  }, 1000);
-}
+    function autoFillSOS() {
+      document.getElementById('sos-form-container').style.display = 'block';
+      document.getElementById('sos-bt').value = 'O-';
+      document.getElementById('sos-units').value = '3';
+      document.getElementById('sos-hospital').value = 'AIIMS Trauma Center';
+      document.getElementById('sos-contact').value = 'Dr. Sharma';
+      document.getElementById('sos-phone').value = '9876543210';
+      document.getElementById('sos-lat').value = '28.5672';
+      document.getElementById('sos-lng').value = '77.2100';
+    }
 
-function resolveSOS() {
-  document.getElementById('live-panel').style.display = 'none';
-  if (timerInterval) clearInterval(timerInterval);
-  showToast('SOS marked as resolved.', 'success');
-}
+    function detectSOS() {
+      if (!navigator.geolocation) return;
+      navigator.geolocation.getCurrentPosition(pos => {
+        document.getElementById('sos-lat').value = pos.coords.latitude.toFixed(6);
+        document.getElementById('sos-lng').value = pos.coords.longitude.toFixed(6);
+      });
+    }
 
-function showToast(msg, type = 'info') {
-  const container = document.getElementById('toast-container');
-  const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
-  const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
-  toast.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
-  container.appendChild(toast);
-  setTimeout(() => toast.remove(), 4500);
-}
+    document.getElementById('sos-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = document.getElementById('sos-submit-btn');
+      btn.textContent = 'TRANSMITTING…'; btn.disabled = true;
 
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js');
-  });
-}
-</script>
-<script src="/static/js/global_sos.js"></script>
+      const payload = {
+        blood_type: document.getElementById('sos-bt').value,
+        units: parseInt(document.getElementById('sos-units').value),
+        hospital_name: document.getElementById('sos-hospital').value,
+        contact_person: document.getElementById('sos-contact').value,
+        contact_phone: document.getElementById('sos-phone').value,
+        lat: parseFloat(document.getElementById('sos-lat').value) || null,
+        lng: parseFloat(document.getElementById('sos-lng').value) || null,
+        patient_name: 'Emergency Protocol Active'
+      };
+
+      try {
+        const res = await fetch('/api/sos/trigger', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        const msg = document.getElementById('sos-msg');
+
+        if (res.ok) {
+          msg.style.color = 'var(--ok-color)';
+          msg.textContent = `SUCCESS: NETWORK ALERTED (${data.donors_alerted} PINGS)`;
+          document.getElementById('sos-form-container').style.display = 'none';
+          document.getElementById('live-panel').style.display = 'block';
+          document.getElementById('live-hospital-info').textContent =
+            `[${payload.hospital_name}] REQUIRES ${payload.units}x ${payload.blood_type}`;
+          document.getElementById('donors-alerted').textContent = data.donors_alerted;
+          startTimer(7200);
+        } else {
+          msg.style.color = 'var(--critical-color)';
+          msg.textContent = 'ERROR: ' + (data.error || 'FAILED TO ESTABLISH UPLINK');
+        }
+      } catch (err) {
+        document.getElementById('sos-msg').textContent = 'NETWORK FAILURE.';
+      } finally {
+        btn.textContent = 'BROADCAST TO NETWORK'; btn.disabled = false;
+      }
+    });
+
+    function startTimer(seconds) {
+      if (timerInterval) clearInterval(timerInterval);
+      let remaining = seconds;
+      const el = document.getElementById('timer-display');
+      timerInterval = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) { clearInterval(timerInterval); el.textContent = 'EXPIRED'; return; }
+        const h = String(Math.floor(remaining / 3600)).padStart(2,'0');
+        const m = String(Math.floor((remaining % 3600) / 60)).padStart(2,'0');
+        const s = String(remaining % 60).padStart(2,'0');
+        el.textContent = `${h}:${m}:${s}`;
+      }, 1000);
+    }
+
+    function resolveSOS() {
+      document.getElementById('live-panel').style.display = 'none';
+      if (timerInterval) clearInterval(timerInterval);
+      showToast('EMERGENCY STANDDOWN CONFIRMED.', 'success');
+    }
+
+    function showToast(msg, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      let color = type === 'error' ? '#FF2A2A' : type === 'success' ? '#00E676' : '#FFAB00';
+      toast.style.cssText = `
+        background: #18181A; border-left: 4px solid ${color}; color: #F0F0F0;
+        padding: 12px 20px; font-family: 'DM Mono', monospace; font-size: 13px;
+        margin-bottom:8px; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      `;
+      toast.innerHTML = msg;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 4000);
+    }
+  </script>
 </body>
 </html>

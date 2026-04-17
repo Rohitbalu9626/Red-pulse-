@@ -3,164 +3,135 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Red Pulse — Admin Dashboard</title>
-  <meta name="description" content="Real-time blood bank management dashboard with live inventory, donor tracking, and AI demand forecasting." />
-  <meta name="theme-color" content="#e63946" />
+  <title>Red Pulse — Luxury Dashboard</title>
+  <meta name="description" content="Premium real-time blood bank management dashboard." />
   <link rel="manifest" href="/manifest.json" />
-  <link rel="apple-touch-icon" href="/static/icon-512.png" />
-  <link rel="stylesheet" href="/static/css/style.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+  <!-- Fonts: Playfair Display & DM Mono & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/static/css/dashboard-luxury.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-  <style>
-    .sos-incoming-bar {
-      background: linear-gradient(90deg, var(--crimson-dark), var(--crimson));
-      padding: 10px 32px; font-size: 13px; font-weight: 700;
-      display: none; align-items: center; justify-content: space-between;
-      animation: pulse-banner 1s infinite;
-    }
-    .sos-incoming-bar.show { display: flex; }
-    @keyframes pulse-banner { 0%,100%{opacity:1} 50%{opacity:0.7} }
-  </style>
 </head>
 <body>
-<div class="app-wrapper">
 
   <!-- Sidebar -->
-  <nav class="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-icon">🩸</div>
-      <div class="logo-text">Red <span>Pulse</span></div>
+  <aside class="luxury-sidebar">
+    <div class="brand">
+      <div class="brand-pulse"></div>
+      Red <span>Pulse</span>
     </div>
-    <div class="sidebar-nav">
-      <div class="nav-label">Main</div>
-      <a href="/dashboard" class="nav-item active">
-        <span class="icon">📊</span><span>Dashboard</span>
-      </a>
-      <a href="/register" class="nav-item">
-        <span class="icon">👤</span><span>Register Donor</span>
-      </a>
-      <a href="/request" class="nav-item">
-        <span class="icon">💉</span><span>Blood Request</span>
-      </a>
-      <a href="/sos" class="nav-item">
-        <span class="icon">🆘</span><span>SOS System</span>
-      </a>
-      <div class="nav-label">Analytics</div>
-      <a href="#forecast-section" class="nav-item">
-        <span class="icon">🔮</span><span>AI Forecast</span>
-      </a>
-    </div>
-  </nav>
-
-  <!-- Main -->
-  <div class="main-content">
-    <!-- SOS Banner -->
-    <div class="sos-incoming-bar" id="sos-banner">
-      🆘 &nbsp;<span id="sos-banner-text">EMERGENCY ALERT RECEIVED</span>
-      <button class="btn btn-outline" onclick="document.getElementById('sos-banner').classList.remove('show')">Dismiss</button>
-    </div>
-
-    <!-- Topbar -->
-    <header class="topbar">
-      <div class="topbar-title">Admin Dashboard</div>
-      <div class="topbar-right">
-        <div class="ws-status">
-          <div class="ws-dot" id="ws-dot"></div>
-          <span id="ws-label">Connecting…</span>
-        </div>
-        <a href="/request" class="btn btn-primary">+ New Request</a>
+    
+    <nav class="nav-menu">
+      <a href="/dashboard" class="nav-link active">Dashboard</a>
+      <a href="/register" class="nav-link">Donor Base</a>
+      <a href="/request" class="nav-link">Transfusions</a>
+      <a href="/sos" class="nav-link">Emergency SOS</a>
+    </nav>
+    
+    <div class="sidebar-bottom">
+      <div class="real-time-clock" id="live-clock">
+        00:00 <span class="clock-pulse"></span>
       </div>
-    </header>
+      <div style="color:var(--text-muted); font-size: 11px;">LOCAL TIME</div>
+      
+      <div class="emergency-alert">
+        <div>
+          <div class="emer-text">Critical Requests</div>
+          <div class="emer-count" id="critical-alert-count">0</div>
+        </div>
+        <div class="brand-pulse" style="width:12px; height:12px; animation-duration:1s;"></div>
+      </div>
+    </div>
+  </aside>
 
-    <div class="page-body">
+  <!-- Main Area -->
+  <main class="main-wrapper">
+    <!-- Live ECG Banner -->
+    <div class="ecg-banner">
+      <div class="ecg-title">Live System Rhythm</div>
+      <div class="ecg-waveform">
+        <svg class="ecg-svg" preserveAspectRatio="none" viewBox="0 0 1000 40">
+          <path class="ecg-line" d="M0,20 L200,20 L210,10 L220,30 L230,20 L400,20 L420,-10 L440,50 L460,20 L650,20 L660,10 L670,30 L680,20 L850,20 L870,0 L890,40 L910,20 L1000,20" />
+        </svg>
+      </div>
+      <div class="bpm-display">
+        BPM <span class="bpm-val" id="bpm-val">72</span>
+      </div>
+    </div>
 
-      <!-- Stat Cards -->
+    <!-- Content Container -->
+    <div class="dashboard-container">
+      
+      <!-- 4 Stat Cards -->
       <div class="stats-grid">
-        <div class="stat-card red">
-          <div class="stat-icon">🏥</div>
-          <div class="stat-value" id="active-requests-count">–</div>
-          <div class="stat-label">Active Requests</div>
+        <div class="stat-card">
+          <div class="stat-label">Total Units</div>
+          <div class="stat-value" id="total-units-count">–</div>
         </div>
-        <div class="stat-card green">
-          <div class="stat-icon">🧑‍🤝‍🧑</div>
+        <div class="stat-card crimson">
+          <div class="stat-label">Critical Types</div>
+          <div class="stat-value" style="color: var(--crimson);" id="critical-types-count">–</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Active Donors</div>
           <div class="stat-value" id="available-donors-count">–</div>
-          <div class="stat-label">Available Donors</div>
         </div>
-        <div class="stat-card amber">
-          <div class="stat-icon">⚠️</div>
-          <div class="stat-value" id="low-stock-count">–</div>
-          <div class="stat-label">Low Stock Alerts</div>
-        </div>
-        <div class="stat-card blue">
-          <div class="stat-icon">🏦</div>
-          <div class="stat-value" id="banks-count">–</div>
-          <div class="stat-label">Active Blood Banks</div>
+        <div class="stat-card">
+          <div class="stat-label">Daily Requests</div>
+          <div class="stat-value" id="active-requests-count">–</div>
         </div>
       </div>
 
       <!-- Inventory Grid -->
-      <div class="section-header">
-        <div class="section-title">Blood Inventory — Live Stock</div>
-        <span class="badge badge-blue" id="last-updated-label">Updating…</span>
+      <div class="section-head">
+        <div>Blood Inventory</div>
+        <div class="section-meta">LIVE STOCK</div>
       </div>
-      <div class="blood-grid" id="blood-inventory-grid">
-        <!-- Populated via JS -->
+      
+      <div class="inventory-grid" id="blood-inventory-grid">
+        <!-- JS Injected -->
       </div>
-
-      <!-- Two Column Section -->
-      <div class="dash-grid">
-        <!-- Active Requests -->
+      
+      <!-- Bottom Section -->
+      <div class="bottom-grid">
+        <!-- Live Activity Feed -->
         <div class="panel">
-          <div class="panel-title">Active Requests</div>
-          <div class="request-list" id="active-requests-list">
-            <p style="color:var(--text-muted);font-size:13px;">Loading…</p>
+          <div class="section-head" style="font-size: 18px; padding-bottom: 12px; margin-bottom:16px;">
+            <div>Live Activity</div>
+            <div class="section-meta">FEED</div>
+          </div>
+          <div class="feed-list" id="activity-feed">
+             <!-- JS Injected -->
           </div>
         </div>
-
-        <!-- Live Map -->
+        
+        <!-- AI Chart -->
         <div class="panel">
-          <div class="panel-title">Live Location Map</div>
-          <div id="live-map"></div>
+          <div class="section-head" style="font-size: 18px; padding-bottom: 12px; margin-bottom:16px; border:none; justify-content:space-between; align-items:center;">
+             <span>Demand Forecast</span>
+             <select id="forecast-blood-type" onchange="loadForecast(this.value)" style="background:var(--bg-panel); color:#FFF; border:1px solid var(--border-subtle); padding:4px 8px; border-radius:4px; font-family:var(--font-mono); outline:none;">
+               <option>O+</option><option>O-</option><option>A+</option><option>A-</option>
+               <option>B+</option><option>B-</option><option>AB+</option><option>AB-</option>
+             </select>
+          </div>
+          <div style="flex:1; position:relative;">
+             <canvas id="forecast-chart"></canvas>
+          </div>
         </div>
       </div>
+      
+      <br/><br/>
+    </div>
+  </main>
+  
+  <div id="toast-container" style="position:fixed; bottom:20px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:8px;"></div>
 
-      <!-- AI Forecast Section -->
-      <div id="forecast-section">
-        <div class="section-header" style="margin-bottom:16px;">
-          <div class="section-title">🔮 AI Blood Demand Forecast (7 Days)</div>
-          <select id="forecast-blood-type" class="btn btn-outline" onchange="loadForecast(this.value)">
-            <option>O+</option><option>O-</option><option>A+</option><option>A-</option>
-            <option>B+</option><option>B-</option><option>AB+</option><option>AB-</option>
-          </select>
-        </div>
-        <div class="panel">
-          <div class="chart-wrapper"><canvas id="forecast-chart"></canvas></div>
-          <p id="forecast-recommendation" style="font-size:13px;color:var(--amber);margin-top:14px;text-align:center;"></p>
-        </div>
-      </div>
-
-    </div><!-- / page-body -->
-  </div><!-- / main-content -->
-</div><!-- / app-wrapper -->
-
-<!-- Global SOS Overlay mapped from global_sos.js -->
-
-<!-- Toast Container -->
-<div id="toast-container"></div>
-
-<script src="/static/js/map.js"></script>
-<script src="/static/js/dashboard.js"></script>
-<script src="/static/js/global_sos.js"></script>
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').then(reg => {
-        console.log('SW registered!', reg);
-      }).catch(err => console.log('SW registration failed:', err));
-    });
-  }
-</script>
+  <!-- Scripts -->
+  <script src="/static/js/dashboard.js"></script>
+  <script src="/static/js/global_sos.js"></script>
 </body>
 </html>
