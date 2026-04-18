@@ -1,5 +1,7 @@
-import eventlet
-eventlet.monkey_patch()
+import sys
+if 'gunicorn' not in sys.argv[0]:
+    import eventlet
+    eventlet.monkey_patch()
 
 import os
 from flask import Flask, jsonify, request
