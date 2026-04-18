@@ -5,6 +5,7 @@ import RegisterDonor from './RegisterDonor';
 import BloodRequest from './BloodRequest';
 import SOSSystem from './SOSSystem';
 import Forecast from './Forecast';
+import GlobalSOS from './GlobalSOS';
 import './index.css';
 
 const tabs = [
@@ -111,6 +112,7 @@ function App() {
           </main>
           <BottomNav />
         </div>
+        <GlobalSOS />
       </div>
     </Router>
   );

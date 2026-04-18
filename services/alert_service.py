@@ -22,7 +22,8 @@ def send_sos_alert(request_data, matched_donors):
         "blood_type": blood_type,
         "units": units,
         "distance": "Varies by donor",
-        "urgency": "CRITICAL / SOS"
+        "urgency": "CRITICAL / SOS",
+        "donors_alerted": len(matched_donors)
     }
     socketio.emit('sos_alert', sos_payload)
     logging.info(f"WebSocket SOS Alert Emitted: {sos_payload}")

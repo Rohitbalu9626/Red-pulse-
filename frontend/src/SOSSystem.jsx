@@ -1,20 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
-import io from 'socket.io-client';
+import React, { useState } from 'react';
 
 const SOSSystem = () => {
   const [form, setForm] = useState({
     blood_type: 'O-', units: 3, hospital_name: '', patient_name: '',
     contact_phone: '', lat: null, lng: null
   });
-  const [triggered, setTriggered] = useState(false);
-  const [alertData, setAlertData] = useState(null);
-  const [timer, setTimer] = useState(7200);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState(null);
-  const timerRef = useRef(null);
-  const socketRef = useRef(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     // GPS
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -22,38 +16,7 @@ const SOSSystem = () => {
         () => {}
       );
     }
-
-    // Socket for incoming SOS alerts
-    socketRef.current = io();
-    socketRef.current.on('sos_alert', (data) => {
-      setTriggered(true);
-      setAlertData(data);
-      startTimer();
-    });
-
-    return () => {
-      if (socketRef.current) socketRef.current.disconnect();
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
   }, []);
-
-  const startTimer = () => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    let remaining = 7200;
-    setTimer(remaining);
-    timerRef.current = setInterval(() => {
-      remaining--;
-      setTimer(remaining);
-      if (remaining <= 0) clearInterval(timerRef.current);
-    }, 1000);
-  };
-
-  const formatTime = (s) => {
-    const h = String(Math.floor(s / 3600)).padStart(2, '0');
-    const m = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
-    const sec = String(s % 60).padStart(2, '0');
-    return `${h}:${m}:${sec}`;
-  };
 
   const handleChange = (e) => {
     const val = e.target.type === 'number' ? parseInt(e.target.value) || 0 : e.target.value;
@@ -83,9 +46,6 @@ const SOSSystem = () => {
       });
       const data = await res.json();
       if (res.ok) {
-        setTriggered(true);
-        setAlertData({ ...form, donors_alerted: data.donors_alerted });
-        startTimer();
         setResult({ type: 'success', msg: `🆘 SOS TRIGGERED — ${data.donors_alerted} donors alerted!` });
       } else {
         setResult({ type: 'error', msg: `❌ ${data.error}` });
@@ -96,42 +56,8 @@ const SOSSystem = () => {
     setSubmitting(false);
   };
 
-  const dismissSOS = () => {
-    setTriggered(false);
-    setAlertData(null);
-    if (timerRef.current) clearInterval(timerRef.current);
-    setTimer(7200);
-  };
-
   return (
     <div style={{ overflowY: 'auto', flex: 1 }}>
-      {/* SOS Overlay when triggered */}
-      {triggered && (
-        <div className="sos-overlay visible">
-          <div className="sos-card">
-            <div className="sos-icon">🆘</div>
-            <div className="sos-title">SOS ALERT</div>
-            <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-main)', marginBottom: '8px' }}>
-              {alertData?.hospital_name || 'Emergency Hospital'}
-            </div>
-            <div style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '16px' }}>
-              {alertData?.blood_type} blood • {alertData?.units} units needed
-            </div>
-            <div className="sos-timer">{formatTime(timer)}</div>
-            <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '1px' }}>TIME REMAINING</div>
-            {alertData?.donors_alerted !== undefined && (
-              <div style={{ fontSize: '16px', marginBottom: '20px' }}>
-                <strong style={{ fontSize: '28px', color: 'var(--brand-pulse)' }}>{alertData.donors_alerted}</strong><br/>
-                Donors Alerted
-              </div>
-            )}
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <button className="btn" style={{ background: 'var(--ok-color)', color: '#FFF' }} onClick={dismissSOS}>✓ Coordinate Response</button>
-              <button className="btn btn-outline" onClick={dismissSOS}>Dismiss</button>
-            </div>
-          </div>
-        </div>
-      )}
 
       <div className="dashboard-container">
         <div className="form-card" style={{ borderColor: 'var(--critical-color)', borderWidth: '2px' }}>
