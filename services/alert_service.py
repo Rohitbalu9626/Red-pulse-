@@ -64,28 +64,4 @@ def send_sos_alert(request_data, matched_donors):
         except Exception as e:
             logging.error(f"Failed to send SOS Email: {e}")
             
-    # 3. SMS logic via Twilio
-    if Config.TWILIO_ACCOUNT_SID and Config.TWILIO_AUTH_TOKEN and Config.TWILIO_PHONE_NUMBER:
-        try:
-            from twilio.rest import Client
-            client = Client(Config.TWILIO_ACCOUNT_SID, Config.TWILIO_AUTH_TOKEN)
-            
-            sms_body = f"🆘 RED PULSE SOS: {hospital_name} urgently needs {units} units of {blood_type} blood. You are a match. Please respond immediately!"
-            
-            sms_sent_count = 0
-            for d in matched_donors:
-                phone = d['entity'].phone
-                if phone:
-                    try:
-                        # Ensure proper E.164 format if not already enforced (e.g. +1234567890)
-                        client.messages.create(
-                            body=sms_body,
-                            from_=Config.TWILIO_PHONE_NUMBER,
-                            to=phone
-                        )
-                        sms_sent_count += 1
-                    except Exception as inner_e:
-                        logging.error(f"Failed to send SMS to {phone}: {inner_e}")
-            logging.info(f"Emergency SOS Twilio SMS sent to {sms_sent_count} donors.")
-        except Exception as e:
-            logging.error(f"Failed to initialize Twilio client: {e}")
+
