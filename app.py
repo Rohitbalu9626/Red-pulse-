@@ -36,7 +36,12 @@ def create_app():
     with app.app_context():
         # Import models so SQLAlchemy creates them
         from database import models
-        db.create_all()
+        print("Starting Database Initialization...", flush=True)
+        try:
+            db.create_all()
+            print("Database Connected & Initialized Successfully!", flush=True)
+        except Exception as e:
+            print(f"DATABASE ERROR: {e}", flush=True)
 
 
     @app.route('/health')
@@ -57,4 +62,6 @@ def create_app():
 app = create_app()
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=app.config['PORT'], debug=app.config['DEBUG'])
+    port = app.config['PORT']
+    print(f"Starting Eventlet Server on port {port}...", flush=True)
+    socketio.run(app, host='0.0.0.0', port=port, debug=app.config['DEBUG'])
